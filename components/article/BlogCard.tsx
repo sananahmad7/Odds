@@ -19,7 +19,7 @@ const BlogCard: FC<Props> = ({ post }) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/blog/${post.slug}`);
+    router.push(`/article/${post.slug}`);
   };
 
   return (

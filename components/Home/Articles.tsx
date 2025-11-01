@@ -24,11 +24,11 @@ const Articles: React.FC = () => {
   }
 
   return (
-    <div className="bg-white min-h-screen relative overflow-hidden">
+    <div className="border bg-white min-h-screen relative overflow-hidden">
       {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-neutral-50 via-transparent to-neutral-50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-neutral-50 via-transparent to-neutral-50 pointer-events-none border" />
 
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16 relative z-10">
+      <div className="border container mx-auto px-4 md:px-6 lg:px-8 py-12 md:py-16 relative z-10">
         {/* Header Section - Tighter spacing */}
         <header className="mb-10 md:mb-12">
           <div className="flex flex-col items-center text-center space-y-3">
@@ -83,7 +83,7 @@ const Articles: React.FC = () => {
                     {/* Category badge */}
                     <div className="absolute top-3 left-3 z-10">
                       <span className="inline-block px-3 py-1 text-[10px] font-poppins font-semibold uppercase tracking-wider bg-[#278394] text-white rounded">
-                        {article.categories[0]?.name ?? "Uncategorized"}
+                        {article.league ?? "Uncategorized"}
                       </span>
                     </div>
                   </div>

@@ -8,7 +8,6 @@ import {
 } from "next/font/google";
 
 import "./globals.css";
-import NavBar from "@/components/NavBar";
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -57,7 +56,6 @@ export default function RootLayout({
         cz-shortcut-listen="true"
         className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${poppins.variable} ${playfair.variable} antialiased`}
       >
-        <NavBar />
         {children}
       </body>
     </html>

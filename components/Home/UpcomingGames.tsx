@@ -13,8 +13,8 @@ export default function UpcomingGames() {
     .slice(0, 6);
 
   return (
-    <section className="w-full bg-white py-16 sm:py-20 px-4 ">
-      <div className="container mx-auto">
+    <section className="w-full bg-white py-16 sm:py-20  border">
+      <div className="container mx-auto border px-4 md:px-6 lg:px-8 ">
         {/* Header */}
         <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>

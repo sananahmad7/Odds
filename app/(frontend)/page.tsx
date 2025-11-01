@@ -8,6 +8,7 @@ export default function Home() {
       <Hero />
       <Articles />
       <UpcomingGames />
+      <div className="h-20" />
     </main>
   );
 }
