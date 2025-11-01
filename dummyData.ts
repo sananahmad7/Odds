@@ -492,6 +492,7 @@ export type ArticleCategory = {
   slug: string;
 };
 
+// LeagueKey is defined elsewhere in your project
 export type BlogArticle = {
   _id: string;
   slug: string;
@@ -501,7 +502,8 @@ export type BlogArticle = {
   categories: ArticleCategory[];
   league: LeagueKey;
   publishedAt: string; // ISO date
-  isFeatured?: boolean; // NEW
+  isFeatured?: boolean;
+  published: boolean; // NEW: control if article is live/visible
 };
 
 // ---------- Data ----------
@@ -523,6 +525,7 @@ export const blogArticles: BlogArticle[] = [
     league: "NFL",
     publishedAt: "2025-01-02T15:10:00.000Z",
     isFeatured: false,
+    published: false,
   },
   {
     _id: "a-nfl-2",
@@ -540,6 +543,7 @@ export const blogArticles: BlogArticle[] = [
     league: "NFL",
     publishedAt: "2025-01-03T12:00:00.000Z",
     isFeatured: true,
+    published: true,
   },
 
   // NBA
@@ -559,6 +563,7 @@ export const blogArticles: BlogArticle[] = [
     league: "NBA",
     publishedAt: "2025-01-04T09:30:00.000Z",
     isFeatured: true,
+    published: false,
   },
   {
     _id: "a-nba-2",
@@ -574,6 +579,7 @@ export const blogArticles: BlogArticle[] = [
     league: "NBA",
     publishedAt: "2025-01-05T11:45:00.000Z",
     isFeatured: false,
+    published: true, // example draft/unpublished
   },
 
   // NCAAF
@@ -593,6 +599,7 @@ export const blogArticles: BlogArticle[] = [
     league: "NCAAF",
     publishedAt: "2025-01-04T14:05:00.000Z",
     isFeatured: true,
+    published: true,
   },
 
   // NCAAB
@@ -612,6 +619,7 @@ export const blogArticles: BlogArticle[] = [
     league: "NCAAB",
     publishedAt: "2025-01-06T10:20:00.000Z",
     isFeatured: false,
+    published: true, // example draft/unpublished
   },
 
   // MLB
@@ -631,6 +639,7 @@ export const blogArticles: BlogArticle[] = [
     league: "MLB",
     publishedAt: "2025-01-07T08:00:00.000Z",
     isFeatured: false,
+    published: true,
   },
 
   // UFC
@@ -650,6 +659,7 @@ export const blogArticles: BlogArticle[] = [
     league: "UFC",
     publishedAt: "2025-01-08T18:30:00.000Z",
     isFeatured: false,
+    published: true,
   },
   {
     _id: "a-ufc-2",
@@ -665,6 +675,6 @@ export const blogArticles: BlogArticle[] = [
     league: "UFC",
     publishedAt: "2025-01-08T20:10:00.000Z",
     isFeatured: false,
+    published: true, // example draft/unpublished
   },
 ];
-
