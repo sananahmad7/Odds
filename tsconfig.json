@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@app/*": [
+        "./app/*" // Add this line to correctly resolve '@app/' alias
       ]
     }
   },

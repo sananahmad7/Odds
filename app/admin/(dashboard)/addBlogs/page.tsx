@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import CreatableSelect from "react-select/creatable";
@@ -8,6 +8,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FiSave } from "react-icons/fi";
 import BlogEditor from "@/components/admin/BlogEditor";
+import axios from "axios"; // Added for API calls
 import { blogArticles, type BlogArticle } from "@/dummyData";
 
 type Option = { value: string; label: string };
@@ -17,12 +18,15 @@ export default function AdminAddBlogPage() {
   const [imagePreview, setImagePreview] = useState<string>("");
   const [content, setContent] = useState<any[]>([]);
   const [isClient, setIsClient] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const [publishDate, setPublishDate] = useState<Date>(new Date());
   const [metaTags, setMetaTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Define isLoading
+
+  // Manage modal state
+  const [isOpen, setIsOpen] = useState(false); // Added state for modal visibility
 
   // Derive existing categories from dummyData
   const existingCategories: Option[] = useMemo(() => {
@@ -37,7 +41,6 @@ export default function AdminAddBlogPage() {
     setIsClient(true);
   }, []);
 
-  // Thumbnail picker (frontend only – no upload). Stores object URL.
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -73,25 +76,19 @@ export default function AdminAddBlogPage() {
       setTagInput("");
     }
   };
+
   const removeTag = (indexToRemove: number) => {
     const next = metaTags.filter((_, i) => i !== indexToRemove);
     setMetaTags(next);
     setValue("metaTags", next);
   };
 
-  // Demo-only submit
-  const onSubmit = (data: any) => {
+  // Submit form data to API
+  const onSubmit = async (data: any) => {
     setSubmitting(true);
 
     // Basic validation (mirror your prev logic)
-    if (
-      !data.title ||
-      !data.categories ||
-      !data.status ||
-      !data.thumbnail ||
-      !metaTags.length ||
-      !publishDate
-    ) {
+    if (!data.title || !data.categories) {
       toast.error("Please fill out all required fields");
       setSubmitting(false);
       return;
@@ -107,28 +104,37 @@ export default function AdminAddBlogPage() {
     }));
     const draft = data.status === "draft";
     const published = !draft;
-
+    const slug = data.title
+      .toLowerCase()
+      .replace(/ /g, "-")
+      .replace(/[^\w-]+/g, "");
+    const league = "NFL";
     const payload = {
       ...data,
+      slug,
+      league,
       categories,
       published,
-      draft,
       content,
       publishDate,
       metaTags,
+      thumbnail: data.thumbnail || "https://via.placeholder.com/400x300", // Temporary fix
     };
 
-    // No backend call now. Just log + toast.
-    console.log("📦 Demo submit payload:", payload);
-    toast.success("(Demo) Blog ready to submit!");
-    setSubmitting(false);
-
-    // Optional: reset the form for demo
-    reset();
-    setImagePreview("");
-    setMetaTags([]);
-    setContent([]);
-    setPublishDate(new Date());
+    try {
+      // Make the API call to add the article
+      await axios.post("/api/addBlog", payload);
+      toast.success("Blog created successfully!");
+      reset();
+      setImagePreview("");
+      setMetaTags([]);
+      setContent([]);
+      setPublishDate(new Date());
+    } catch (error) {
+      toast.error("Failed to create blog");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -242,30 +248,28 @@ export default function AdminAddBlogPage() {
             />
           </div>
         )}
-
-        {/* Date + Thumbnail */}
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-1/2">
-            <label className="block text-sm font-poppins text-gray-700 mb-2">
-              Publish Date<span className="text-red-500"> *</span>
+        <div className="flex gap-4 w-full justify-between items-start">
+          <div className="w-[50%]">
+            <label className="block text-sm font-medium text-gray-700 mb-2 font-orbitron">
+              Publish Date
             </label>
             <DatePicker
               selected={publishDate}
               onChange={(date) => {
-                const d = date || new Date();
-                setPublishDate(d);
-                setValue("publishDate", d);
+                if (date) {
+                  setPublishDate(date);
+                  setValue("publishDate", date);
+                }
               }}
-              className="w-full font-poppins py-3 px-3 border-2 border-gray-200 rounded-lg"
+              className="w-full py-3 pl-3 pr-20 border-2 border-gray-200 rounded-lg"
               dateFormat="MMMM d, yyyy"
             />
           </div>
-
-          <div className="md:w-1/2">
-            <label className="block text-sm font-poppins text-gray-700 mb-2">
-              Thumbnail<span className="text-red-500"> *</span>
+          <div className="w-[50%] text-start">
+            <label className="block text-sm font-medium text-gray-700 mb-2 font-orbitron">
+              Thumbnail
             </label>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-14 relative bottom-px">
               <input
                 type="file"
                 onChange={handleThumbnailChange}
@@ -275,25 +279,25 @@ export default function AdminAddBlogPage() {
               />
               <label
                 htmlFor="thumbnail"
-                className={`px-5 py-2 font-poppins rounded-md cursor-pointer transition-colors ${
-                  uploading
+                className={`px-16 py-3 font-orbitron rounded-md cursor-pointer transition-colors ${
+                  isLoading
                     ? "bg-gray-500 text-gray-200 cursor-wait"
-                    : "bg-[#263E4D] text-white hover:bg-[#1a2834]"
+                    : "bg-black text-white hover:bg-gray-800"
                 }`}
               >
-                {uploading ? "Uploading..." : "Choose Image"}
+                {isLoading ? "Uploading..." : "Choose Image"}
               </label>
-
               {imagePreview ? (
                 <img
                   src={imagePreview}
                   alt="Preview"
-                  className="w-20 h-20 object-cover rounded-md border-2 border-gray-200"
+                  className="w-20 h-20 object-cover rounded-md border-2 border-gray-200 relative bottom-px"
                 />
               ) : (
-                <div className="w-20 h-20 bg-gray-200 text-xs flex items-center justify-center rounded-md border-2 border-gray-200">
-                  <p className="text-center font-poppins">
-                    No Image <br /> selected
+                <div className="w-20 h-20 bg-gray-200 text-xs flex items-center justify-center rounded-md border-2 border-gray-200 relative bottom-px">
+                  <p className="text-center">
+                    No Image <br />
+                    selected
                   </p>
                 </div>
               )}
@@ -301,74 +305,69 @@ export default function AdminAddBlogPage() {
           </div>
         </div>
 
-        {/* Status */}
-        <div className="flex flex-col gap-3">
-          <label className="block text-sm font-poppins text-gray-700">
-            Status<span className="text-red-500"> *</span>
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <label className="flex-1 cursor-pointer">
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-4">
+            <label className="flex-1 cursor-pointer font-orbitron">
               <input
                 type="radio"
                 {...register("status")}
                 value="published"
                 className="hidden peer"
               />
-              <div className="p-4 text-center border-2 border-gray-200 rounded-lg peer-checked:border-white peer-checked:bg-[#263E4D] peer-checked:text-white transition-all hover:bg-gray-50">
-                <span className="font-poppins font-medium">Publish</span>
+              <div className="p-4 text-center border-2 border-gray-200 rounded-lg peer-checked:border-white peer-checked:bg-gray-900 peer-checked:text-gray-100 transition-all hover:bg-gray-100 hover:text-gray-900">
+                <span className="font-medium">Publish</span>
               </div>
             </label>
-            <label className="flex-1 cursor-pointer">
+            <label className="flex-1 cursor-pointer font-orbitron">
               <input
                 type="radio"
                 {...register("status")}
                 value="draft"
                 className="hidden peer"
               />
-              <div className="p-4 text-center border-2 border-gray-200 rounded-lg peer-checked:border-white peer-checked:bg-[#263E4D] peer-checked:text-white transition-all hover:bg-gray-50">
-                <span className="font-poppins font-medium">Save as Draft</span>
+              <div className="p-4 text-center border-2 border-gray-200 rounded-lg peer-checked:border-white peer-checked:bg-gray-900 peer-checked:text-gray-100 transition-all hover:bg-gray-100 hover:text-gray-900">
+                <span className="font-medium">Save as Draft</span>
               </div>
             </label>
           </div>
         </div>
 
-        {/* Meta Description */}
+        {/* Description */}
         <div>
-          <label className="block text-sm font-poppins text-gray-700 mb-2">
-            Meta Description<span className="text-red-500"> *</span>
+          <label className="block text-sm font-medium text-gray-700 mb-2 font-orbitron">
+            Enter Meta Description
           </label>
           <textarea
             {...register("description", { required: true })}
-            rows={4}
-            className="w-full font-poppins p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:border-black transition-all"
-            placeholder="Enter meta description"
+            rows={4} // Ensure this is a number, not a string
+            className="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:border-black transition-all"
+            placeholder="Enter Meta description"
           />
         </div>
 
-        {/* Meta Tags */}
         <div>
-          <label className="block text-sm font-poppins text-gray-700 mb-2">
-            Meta Tags<span className="text-red-500"> *</span>
+          <label className="block text-sm font-medium text-gray-700 mb-2 font-orbitron">
+            Meta Tags
           </label>
           <input
             type="text"
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagInput}
-            className="w-full font-poppins p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:border-black transition-all"
-            placeholder="Enter tags (press Enter or , to add)"
+            className="w-full p-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-white focus:border-black transition-all"
+            placeholder="Enter tags (press enter to add)"
           />
           <div className="mt-2 flex flex-wrap gap-2">
             {metaTags.map((tag, index) => (
               <span
                 key={index}
-                className="bg-gray-200 px-3 py-1 rounded-lg text-sm flex items-center gap-2 font-poppins"
+                className="bg-gray-300 px-3 py-1 rounded-lg text-sm flex items-center gap-2"
               >
                 {tag}
                 <button
                   type="button"
                   onClick={() => removeTag(index)}
-                  className="text-gray-600 text-lg leading-none hover:text-gray-800 cursor-pointer"
+                  className="text-gray-500 text-lg relative bottom-[1px] cursor-pointer hover:text-gray-700"
                   aria-label={`Remove tag ${tag}`}
                 >
                   ×
@@ -378,7 +377,7 @@ export default function AdminAddBlogPage() {
           </div>
         </div>
 
-        {/* Submit */}
+        {/* Submit Button */}
         <div className="flex justify-center">
           <button
             type="submit"
@@ -388,7 +387,6 @@ export default function AdminAddBlogPage() {
                 ? "bg-gray-500 cursor-wait text-gray-200"
                 : "bg-[#263E4D] hover:bg-[#1a2834] text-white cursor-pointer"
             } focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2`}
-            aria-label="Submit blog form"
           >
             {submitting && (
               <svg
