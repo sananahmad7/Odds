@@ -65,7 +65,7 @@ const Articles: React.FC = () => {
             {articles.map((article) => (
               <Link
                 key={article._id}
-                href={`/blog/${article.slug}`}
+                href={`/article/${article.slug}`}
                 className="block group"
               >
                 <article className="relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-neutral-400/30 h-full">
@@ -98,7 +98,7 @@ const Articles: React.FC = () => {
                     </p>
 
                     {/* Read more link */}
-                    <div className="flex items-center text-sm font-poppins font-medium text-white  transition-colors">
+                    <div className="flex items-center text-sm font-poppins font-medium text-white w-fit transition-colors ">
                       <span>Read Article</span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

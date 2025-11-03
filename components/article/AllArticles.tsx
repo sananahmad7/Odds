@@ -116,7 +116,7 @@ const AllArticles = () => {
         <div className="flex flex-col gap-4 mb-6">
           {/* Search (enhanced design) */}
           <div className="flex items-center mt-5">
-            <div className="relative w-full md:w-[32rem] group">
+            <div className="relative w-full md:w-lg group">
               <label htmlFor="article-search" className="sr-only">
                 Search articles by title
               </label>

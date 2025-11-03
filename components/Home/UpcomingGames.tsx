@@ -153,7 +153,7 @@ export default function UpcomingGames() {
 
                 {/* CTA */}
                 <button className="mt-4 w-full h-10 rounded-lg bg-[#101828] text-white text-sm font-inter font-semibold hover:opacity-95 transition">
-                  Read Article
+                  See Prediction
                 </button>
               </div>
             </div>
