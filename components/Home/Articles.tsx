@@ -83,7 +83,7 @@ const Articles: React.FC = () => {
                     {/* Category badge */}
                     <div className="absolute top-3 left-3 z-10">
                       <span className="inline-block px-3 py-1 text-[10px] font-poppins font-semibold uppercase tracking-wider bg-[#278394] text-white rounded">
-                        {article.league ?? "Uncategorized"}
+                        {article.categories[0]?.name ?? "Uncategorized"}
                       </span>
                     </div>
                   </div>
