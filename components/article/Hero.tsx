@@ -54,13 +54,6 @@ export default function Hero() {
           {/* Content */}
           <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12">
             <div className="max-w-3xl">
-              {/* League Badge */}
-              <div className="mb-4">
-                <span className="inline-block px-4 py-2 bg-[#278394] text-black text-xs font-bold rounded-full">
-                  {featured[currentIndex].league}
-                </span>
-              </div>
-
               {/* Title */}
               <h1 className="text-2xl md:text-3xl font-bold font-playfair text-white mb-3 text-balance leading-tight">
                 {featured[currentIndex].title}

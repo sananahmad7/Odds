@@ -73,9 +73,6 @@ export default async function ArticlePage({ params }: PageProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 px-6 md:px-10 pb-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-black/70 text-white">
-              {article.league}
-            </span>
             {article.categories.map((c) => (
               <span
                 key={c.slug}
