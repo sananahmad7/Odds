@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     categories = [],        // [{ name, slug }]
     content = [],           // [{ type, content, description? }]
     published = false,
-    isFeatured = false,     // <— include this
+    isFeatured = false,     // <— include this vdvx 
   } = await req.json();
 
   if (!title || !description || !categories?.length || !content?.length || !publishDate) {
