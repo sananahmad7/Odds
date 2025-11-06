@@ -34,9 +34,9 @@ export async function PUT(
       const totalFeatured = await prisma.article.count({
         where: { isFeatured: true },
       });
-      if (totalFeatured >= 9) {
+      if (totalFeatured >= 3) {
         return NextResponse.json(
-          { error: "Maximum of 9 featured blogs allowed" },
+          { error: "Maximum of 3 featured blogs allowed" },
           { status: 400 }
         );
       }
