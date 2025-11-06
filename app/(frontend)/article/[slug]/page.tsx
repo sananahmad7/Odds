@@ -201,7 +201,7 @@ export default function ArticlePage() {
         {/* Hero Section Skeleton */}
         <div className="relative h-screen w-full">
           {/* Navbar Placeholder */}
-          <div
+          {/* <div
             className="fixed top-0 left-0 right-0 z-50"
             style={{ backgroundColor: "rgba(36, 37, 124, 0.45)" }}
           >
@@ -216,14 +216,14 @@ export default function ArticlePage() {
                 ))}
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Static Slide Skeleton */}
           <div className="relative h-full w-full overflow-hidden">
             <div className="absolute inset-0 w-full h-full">
               {/* Background image placeholder */}
               <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-black/20"></div>
 
               {/* Content Placeholder */}
               <div className="relative z-10 h-full flex items-end">
@@ -343,10 +343,10 @@ export default function ArticlePage() {
             </div>
 
             {/* Content */}
-            <div className="relative z-10 h-full flex items-end">
-              <div className="container mx-auto px-4 pb-16 md:pb-24">
+            <div className="relative z-10 h-full flex items-end ">
+              <div className="container mx-auto px-8 pb-16 md:pb-22">
                 {/* Article Preview */}
-                <div className="text-white max-w-2xl">
+                <div className="text-white max-w-3xl border border-red-400">
                   <span
                     className="inline-block px-3 py-1 rounded-md text-sm mb-4"
                     style={{ backgroundColor: "#25818F" }}
@@ -369,14 +369,6 @@ export default function ArticlePage() {
                     <p className="text-gray-100 text-sm">
                       {format(new Date(article.publishedAt), "MMMM d, yyyy")}
                     </p>
-                    {article.isFeatured && (
-                      <span
-                        className="text-sm px-3 py-1 rounded-full"
-                        style={{ backgroundColor: "#C83495", color: "white" }}
-                      >
-                        Featured
-                      </span>
-                    )}
                   </div>
                 </div>
               </div>

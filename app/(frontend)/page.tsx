@@ -3,7 +3,7 @@ import UpcomingGames from "@/components/Home/UpcomingGames";
 
 export default function Home() {
   return (
-    <main className="">
+    <main>
       <HomeHero />
 
       <UpcomingGames />

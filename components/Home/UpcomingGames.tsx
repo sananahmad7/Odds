@@ -82,7 +82,7 @@ export default function UpcomingGames() {
           {/* View All (desktop) */}
           <Link
             href={`/league/${selectedLeague.toLowerCase()}`}
-            className="hidden md:inline-flex items-center justify-center h-10 px-5 rounded-lg bg-[#24257C] text-white text-sm font-semibold hover:bg-[#C83495] transition"
+            className="hidden md:inline-flex items-center cursor-pointer justify-center h-10 px-5 rounded-lg bg-[#24257C] text-white text-sm font-semibold hover:bg-[#C83495] transition"
           >
             View All
           </Link>
@@ -103,7 +103,7 @@ export default function UpcomingGames() {
                     "px-5 sm:px-6 py-2.5 rounded-full text-sm sm:text-base font-semibold whitespace-nowrap transition-all",
                     isActive
                       ? "bg-[#24257C] text-white shadow-sm"
-                      : "bg-white text-gray-700 border border-gray-200 hover:border-[#24257C] hover:text-[#24257C]",
+                      : "bg-white text-gray-700 border cursor-pointer border-gray-200 hover:border-[#24257C] hover:text-[#24257C]",
                   ].join(" ")}
                 >
                   {league}

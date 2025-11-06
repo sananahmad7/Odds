@@ -1,7 +1,9 @@
+// components/Hero.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 type CategoryChip = { name: string; slug: string };
 type FeaturedArticle = {
@@ -11,42 +13,40 @@ type FeaturedArticle = {
   description: string;
   thumbnail: string | null;
   categories: CategoryChip[];
-  publishedAt: string; // ISO
+  publishedAt: string;
   isFeatured: boolean;
   published: boolean;
 };
 
-export default function Hero() {
-  const [featured, setFeatured] = useState<FeaturedArticle[]>([]);
-  const [loading, setLoading] = useState(false);
+type HeroProps = { initialFeatured?: FeaturedArticle[] };
+
+export default function Hero({ initialFeatured = [] }: HeroProps) {
+  const [featured, setFeatured] = useState<FeaturedArticle[]>(initialFeatured);
   const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // NEW: single-shot timer that we can reset
+  // resettable timer
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ROTATE_MS = 7000;
 
-  // Fetch featured from API
+  // Background refresh (optional): keeps SSR content, then refreshes client-side
   useEffect(() => {
     let isMounted = true;
     (async () => {
-      setLoading(true);
-      setError(null);
       try {
-        const res = await fetch("/api/getFeaturedBlogs", { cache: "no-store" });
+        const res = await fetch("/api/getFeaturedBlogs", {
+          cache: "no-cache",
+        });
         if (!res.ok) {
           const body = await res.json().catch(() => null);
           throw new Error(body?.error || "Failed to load featured blogs");
         }
         const data: FeaturedArticle[] = await res.json();
-        if (isMounted) {
-          setFeatured(Array.isArray(data) ? data : []);
-          setCurrentIndex(0);
-        }
+        if (!isMounted) return;
+        setFeatured(Array.isArray(data) ? data : []);
+        setCurrentIndex(0);
       } catch (e: any) {
         if (isMounted) setError(e?.message || "Failed to load featured blogs");
-      } finally {
-        if (isMounted) setLoading(false);
       }
     })();
     return () => {
@@ -54,78 +54,73 @@ export default function Hero() {
     };
   }, []);
 
-  // Auto-rotate with reset on any index change
+  // auto-rotate, resets on manual change
   useEffect(() => {
-    // Clear any existing timer
     if (timerRef.current) clearTimeout(timerRef.current);
-
     if (featured.length > 1) {
-      // Start a fresh timer
       timerRef.current = setTimeout(() => {
-        setCurrentIndex((prev) =>
-          prev === featured.length - 1 ? 0 : prev + 1
-        );
+        setCurrentIndex((p) => (p === featured.length - 1 ? 0 : p + 1));
       }, ROTATE_MS);
     }
-
-    // Cleanup on unmount / dep change
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [currentIndex, featured.length]); // <— depends on index, so it resets after manual changes too
+  }, [currentIndex, featured.length]);
 
-  // Keyboard navigation (← / →)
+  // keyboard + manual nav
   useEffect(() => {
     if (featured.length <= 1) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") {
-        setCurrentIndex((prev) => (prev + 1) % featured.length);
-      } else if (e.key === "ArrowLeft") {
-        setCurrentIndex(
-          (prev) => (prev - 1 + featured.length) % featured.length
-        );
-      }
+      if (e.key === "ArrowRight")
+        setCurrentIndex((p) => (p + 1) % featured.length);
+      if (e.key === "ArrowLeft")
+        setCurrentIndex((p) => (p - 1 + featured.length) % featured.length);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [featured.length]);
 
-  const handleDotClick = (index: number) => setCurrentIndex(index);
-  const handleNext = () =>
-    setCurrentIndex((prev) => (prev + 1) % featured.length);
+  const handleDotClick = (i: number) => setCurrentIndex(i);
+  const handleNext = () => setCurrentIndex((p) => (p + 1) % featured.length);
   const handlePrev = () =>
-    setCurrentIndex((prev) => (prev - 1 + featured.length) % featured.length);
+    setCurrentIndex((p) => (p - 1 + featured.length) % featured.length);
 
-  // Nothing to show
-  if (loading || error || featured.length === 0) return null;
-
-  const currentArticle = featured[currentIndex];
+  // Always render a visible hero (no null)
+  const hasData = featured.length > 0;
+  const current = hasData ? featured[currentIndex] : null;
   const canNav = featured.length > 1;
 
   return (
     <section className="w-full bg-white">
       <div className="relative w-full h-[500px] md:h-[600px]">
-        {/* Background Image */}
-        <img
-          src={currentArticle.thumbnail || "/placeholder.svg"}
-          alt={currentArticle.title}
-          className="w-full h-full object-cover"
-        />
+        {/* image / placeholder */}
+        <div className="absolute inset-0">
+          {hasData && current?.thumbnail ? (
+            <Image
+              src={current.thumbnail}
+              alt={current.title}
+              fill
+              sizes="100vw"
+              priority
+              className="object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200" />
+          )}
+        </div>
 
-        {/* Subtle Dark Overlay */}
         <div className="absolute inset-0 bg-black/40" />
 
-        {/* Top-left label */}
+        {/* label */}
         <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
           <span className="inline-block px-4 py-2 rounded font-inter font-semibold tracking-wide uppercase text-xs md:text-sm bg-[#24257C] text-white">
             Analysis of the Day
           </span>
         </div>
 
-        {/* Arrow Buttons */}
+        {/* arrows */}
         {canNav && (
           <>
-            {/* Prev */}
             <button
               type="button"
               onClick={handlePrev}
@@ -143,8 +138,6 @@ export default function Hero() {
                 />
               </svg>
             </button>
-
-            {/* Next */}
             <button
               type="button"
               onClick={handleNext}
@@ -165,51 +158,49 @@ export default function Hero() {
           </>
         )}
 
-        {/* Content */}
-        <div className=" absolute inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16">
-          <div className="max-w-4xl">
-            <div className="ml-2">
-              {/* League Tag */}
-              <span className="inline-block px-3 py-1 bg-white/90 text-[#111827] text-sm font-semibold font-inter rounded mb-4">
-                {currentArticle.categories.find((c) =>
-                  ["nfl", "nba", "mlb", "ufc", "ncaaf", "ncaab"].includes(
-                    c.slug.toLowerCase()
-                  )
-                )?.name ||
-                  currentArticle.categories[0]?.name ||
-                  "SPORTS"}
-              </span>
+        {/* content */}
+        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16">
+          <div className="max-w-4xl ml-2">
+            <span className="inline-block px-3 py-1 bg-white/90 text-[#111827] text-sm font-semibold font-inter rounded mb-4">
+              {hasData
+                ? current!.categories.find((c) =>
+                    ["nfl", "nba", "mlb", "ufc", "ncaaf", "ncaab"].includes(
+                      c.slug.toLowerCase()
+                    )
+                  )?.name ||
+                  current!.categories[0]?.name ||
+                  "SPORTS"
+                : "SPORTS"}
+            </span>
 
-              {/* Title */}
-              <Link href={`/article/${currentArticle.slug}`}>
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-playfair text-white mb-8 leading-tight">
-                  {currentArticle.title}
-                </h1>
-              </Link>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-playfair text-white mb-8 leading-tight">
+              {hasData ? current!.title : "Loading analysis…"}
+            </h1>
 
-              {/* CTA */}
-              <Link href={`/article/${currentArticle.slug}`}>
-                <button className="inline-block cursor-pointer px-6 py-3 bg-[#24257C] hover:bg-[#C83495] text-white font-inter font-medium rounded transition-colors duration-300">
-                  Read Analysis
-                </button>
-              </Link>
-            </div>
+            <Link href={hasData ? `/article/${current!.slug}` : `#`}>
+              <button
+                disabled={!hasData}
+                className="inline-block px-6 py-3 cursor-pointer bg-[#24257C] hover:bg-[#C83495] disabled:opacity-60 disabled:cursor-not-allowed text-white font-inter font-medium rounded transition-colors duration-300"
+              >
+                Read Analysis
+              </button>
+            </Link>
           </div>
         </div>
 
-        {/* Dot Indicators */}
+        {/* dots */}
         {canNav && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-10">
-            {featured.map((_, index) => (
+          <div className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-10">
+            {featured.map((_, i) => (
               <button
-                key={index}
-                onClick={() => handleDotClick(index)}
+                key={i}
+                onClick={() => handleDotClick(i)}
                 className={`transition-all duration-300 rounded-full ${
-                  index === currentIndex
-                    ? "bg-[#24257C] w-10 h-3 cursor-pointer"
+                  i === currentIndex
+                    ? "bg-[#24257C] w-10 h-3 "
                     : "bg-white/60 w-3 h-3 hover:bg-white/90 cursor-pointer"
                 }`}
-                aria-label={`Go to article ${index + 1}`}
+                aria-label={`Go to article ${i + 1}`}
               />
             ))}
           </div>

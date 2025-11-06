@@ -1,4 +1,5 @@
 // app/(frontend)/layout.tsx
+import Footer from "@/components/Footer";
 import NavBar from "@/components/NavBar"; // can be a Client Component
 
 export default function FrontendLayout({
@@ -12,6 +13,7 @@ export default function FrontendLayout({
     <>
       <NavBar />
       {children}
+      <Footer />
     </>
   );
 }

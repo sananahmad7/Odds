@@ -3,13 +3,76 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+const LeagueLogos = {
+  NFL: () => (
+    <Image
+      src="/nfl.svg" // <- file lives in /public/nfl.svg
+      alt="NFL"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+      priority={false}
+    />
+  ),
+  NBA: () => (
+    <Image
+      src="/nba-6.svg" // <- file lives in /public/nfl.svg
+      alt="NFL"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+      priority={false}
+    />
+  ),
+  NCAAF: () => (
+    <Image
+      src="/ncaaf.svg" // <- file lives in /public/nfl.svg
+      alt="NFL"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+      priority={false}
+    />
+  ),
+  NCAAB: () => (
+    <Image
+      src="/ncaa-1.svg" // <- file lives in /public/nfl.svg
+      alt="NFL"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+      priority={false}
+    />
+  ),
+  MLB: () => (
+    <Image
+      src="/mlb-1.svg" // <- file lives in /public/nfl.svg
+      alt="NFL"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+      priority={false}
+    />
+  ),
+  UFC: () => (
+    <Image
+      src="/ufc.png" // <- file lives in /public/nfl.svg
+      alt="NFL"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+      priority={false}
+    />
+  ),
+};
+
 const leagues = [
-  { href: "/league/nfl", label: "NFL" },
-  { href: "/league/nba", label: "NBA" },
-  { href: "/league/ncaaf", label: "NCAAF" },
-  { href: "/league/ncaab", label: "NCAAB" },
-  { href: "/league/mlb", label: "MLB" },
-  { href: "/league/ufc", label: "UFC" },
+  { href: "/league/nfl", label: "NFL", logo: LeagueLogos.NFL },
+  { href: "/league/nba", label: "NBA", logo: LeagueLogos.NBA },
+  { href: "/league/ncaaf", label: "NCAAF", logo: LeagueLogos.NCAAF },
+  { href: "/league/ncaab", label: "NCAAB", logo: LeagueLogos.NCAAB },
+  { href: "/league/mlb", label: "MLB", logo: LeagueLogos.MLB },
+  { href: "/league/ufc", label: "UFC", logo: LeagueLogos.UFC },
 ];
 
 function NavBar() {
@@ -26,16 +89,16 @@ function NavBar() {
   };
 
   return (
-    <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm font-inter">
+    <nav className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-md font-inter">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-20 ">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <Image src="/WebLogo.png" width={150} height={150} alt="Logo" />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center ">
+          <div className="hidden lg:flex items-center">
             {/* Home Link */}
             <Link
               href="/"
@@ -47,7 +110,7 @@ function NavBar() {
 
             {/* League Dropdown */}
             <div
-              className="relative  py-5 px-10"
+              className="relative py-5 px-10"
               onMouseEnter={() => setLeagueDropdownOpen(true)}
               onMouseLeave={() => setLeagueDropdownOpen(false)}
             >
@@ -73,16 +136,20 @@ function NavBar() {
 
               {/* Dropdown Menu */}
               {leagueDropdownOpen && (
-                <div className="absolute  top-full left-0  w-48 bg-white border border-gray-500 rounded-lg shadow-lg overflow-hidden">
-                  {leagues.map((league) => (
-                    <Link
-                      key={league.href}
-                      href={league.href}
-                      className="block  px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
-                    >
-                      {league.label}
-                    </Link>
-                  ))}
+                <div className="absolute top-full left-0 w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+                  {leagues.map((league) => {
+                    const LogoComponent = league.logo;
+                    return (
+                      <Link
+                        key={league.href}
+                        href={league.href}
+                        className="flex items-center gap-3 px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
+                      >
+                        <LogoComponent />
+                        <span>{league.label}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -207,15 +274,19 @@ function NavBar() {
               {/* Mobile League Items */}
               {leagueDropdownOpen && (
                 <div className="bg-gray-50">
-                  {leagues.map((league) => (
-                    <Link
-                      key={league.href}
-                      href={league.href}
-                      className="block pl-8 pr-4 py-3 text-[#111827] font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
-                    >
-                      {league.label}
-                    </Link>
-                  ))}
+                  {leagues.map((league) => {
+                    const LogoComponent = league.logo;
+                    return (
+                      <Link
+                        key={league.href}
+                        href={league.href}
+                        className="flex items-center gap-3 pl-8 pr-4 py-3 text-[#111827] font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
+                      >
+                        <LogoComponent />
+                        <span>{league.label}</span>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
