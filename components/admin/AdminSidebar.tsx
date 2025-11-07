@@ -43,11 +43,10 @@ export default function AdminSidebar() {
     setOpen(false);
   }, [pathname]);
 
-  const handleLogout = () => {
-    if (confirm("Are you sure you want to logout?")) {
-      localStorage.clear();
-      window.location.href = "/admin/login";
-    }
+  const handleLogout = async () => {
+    if (!confirm("Are you sure you want to logout?")) return;
+    await fetch("/api/admin/logout", { method: "POST" });
+    window.location.href = "/admin/login";
   };
 
   return (

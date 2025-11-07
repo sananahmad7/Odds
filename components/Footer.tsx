@@ -47,8 +47,8 @@ export default function Footer() {
       {/* Brand accent line */}
       <div className="h-1 w-full bg-[#24257C]" />
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="mx-auto container px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 justify-center">
           {/* 1) Logo + desc + socials */}
           <div>
             <div className="flex items-center gap-3">
@@ -176,7 +176,7 @@ export default function Footer() {
               <button
                 type="submit"
                 disabled={sending}
-                className="inline-flex items-center justify-center rounded-md bg-[#24257C] px-4 py-2 font-semibold text-white transition-colors hover:bg-[#C83495] disabled:opacity-70 disabled:cursor-not-allowed"
+                className="inline-flex cursor-pointer items-center justify-center rounded-md bg-[#24257C] px-4 py-2 font-semibold text-white transition-colors hover:bg-[#C83495] disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {sending ? "Sending..." : "Send Message"}
               </button>

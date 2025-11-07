@@ -1,19 +1,17 @@
-// app/(frontend)/layout.tsx
 import Footer from "@/components/Footer";
-import NavBar from "@/components/NavBar"; // can be a Client Component
+import NavBar from "@/components/NavBar";
+import { SearchProvider } from "@/components/providers/SearchProvider";
 
 export default function FrontendLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // This layout is nested under app/layout.tsx.
-  // It wraps ONLY the routes inside (frontend).
   return (
-    <>
+    <SearchProvider>
       <NavBar />
       {children}
       <Footer />
-    </>
+    </SearchProvider>
   );
 }

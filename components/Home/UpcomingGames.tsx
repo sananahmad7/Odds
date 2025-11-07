@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { upcomingGames } from "@/dummyData";
 import type { UpcomingGame } from "@/dummyData";
+import { useSearch } from "@/components/providers/SearchProvider";
 
 /** Parse a kickoff timestamp (ms) from game fields. */
 function getKickoffTimestampFromGame(game: UpcomingGame): number {
@@ -18,7 +20,6 @@ function getKickoffTimestampFromGame(game: UpcomingGame): number {
   const composed = timePart
     ? `${game.date} ${timePart}${tzPart ? ` ${tzPart}` : ""}`
     : game.date;
-
   const parsed = Date.parse(composed);
   return Number.isFinite(parsed) ? parsed : NaN;
 }
@@ -30,14 +31,81 @@ function isWithinNextSevenDays(ts: number, nowMs: number) {
   return ts >= nowMs && ts <= nowMs + sevenDaysMs;
 }
 
+/* --------- Logos + leagues for dropdown --------- */
+const LeagueLogos = {
+  NFL: () => (
+    <Image
+      src="/nfl.svg"
+      alt="NFL"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+    />
+  ),
+  NBA: () => (
+    <Image
+      src="/nba-6.svg"
+      alt="NBA"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+    />
+  ),
+  NCAAF: () => (
+    <Image
+      src="/ncaaf.svg"
+      alt="NCAAF"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+    />
+  ),
+  NCAAB: () => (
+    <Image
+      src="/ncaa-1.svg"
+      alt="NCAAB"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+    />
+  ),
+  MLB: () => (
+    <Image
+      src="/mlb-1.svg"
+      alt="MLB"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+    />
+  ),
+  UFC: () => (
+    <Image
+      src="/ufc.png"
+      alt="UFC"
+      width={30}
+      height={30}
+      className="w-7 h-7"
+    />
+  ),
+};
+
+const leagues = [
+  { href: "/league/nfl", label: "NFL", logo: LeagueLogos.NFL },
+  { href: "/league/nba", label: "NBA", logo: LeagueLogos.NBA },
+  { href: "/league/ncaaf", label: "NCAAF", logo: LeagueLogos.NCAAF },
+  { href: "/league/ncaab", label: "NCAAB", logo: LeagueLogos.NCAAB },
+  { href: "/league/mlb", label: "MLB", logo: LeagueLogos.MLB },
+  { href: "/league/ufc", label: "UFC", logo: LeagueLogos.UFC },
+] as const;
+
 export default function UpcomingGames() {
+  const { query } = useSearch();
+
   const [selectedLeague, setSelectedLeague] = useState<
     "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC"
   >("NFL");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const leagueTabs = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "UFC"];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -78,16 +146,35 @@ export default function UpcomingGames() {
       isWithinNextSevenDays(getKickoffTimestampFromGame(g), nowTimestamp)
     );
 
-    return withinWindow.slice(0, 6);
-  }, [selectedLeague, nowTimestamp]);
+    // Live search (from NavBar)
+    const q = query.trim().toLowerCase();
+    const searched = !q
+      ? withinWindow
+      : withinWindow.filter((g) => {
+          const hay = [
+            g.awayTeam.name,
+            g.homeTeam.name,
+            g.venue || "",
+            g.league,
+          ]
+            .join(" ")
+            .toLowerCase();
+          return hay.includes(q);
+        });
+
+    return searched.slice(0, 6);
+  }, [selectedLeague, nowTimestamp, query]);
 
   const handleLeagueSelect = (league: typeof selectedLeague) => {
     setSelectedLeague(league);
     setIsDropdownOpen(false);
   };
 
+  const active = leagues.find((l) => l.label === selectedLeague)!;
+  const ActiveLogo = active.logo;
+
   return (
-    <section className="w-full bg-white py-16 sm:py-20">
+    <section id="upcoming" className="w-full bg-white py-16 sm:py-20">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
@@ -115,11 +202,15 @@ export default function UpcomingGames() {
             className="relative inline-block w-full sm:w-auto"
             ref={dropdownRef}
           >
+            {/* Toggle button shows current league + logo */}
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="w-full sm:w-94 cursor-pointer flex items-center justify-between px-5 py-3 bg-white border-2 border-gray-200 rounded-lg text-[#111827] font-semibold text-base  transition-colors focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:ring-offset-2"
+              className="w-full sm:w-94 cursor-pointer flex items-center justify-between px-5 py-3 bg-white border-2 border-gray-200 rounded-lg text-[#111827] font-semibold text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:ring-offset-2"
             >
-              <span>{selectedLeague}</span>
+              <span className="flex items-center gap-3">
+                <ActiveLogo />
+                <span>{selectedLeague}</span>
+              </span>
               <svg
                 className={`w-5 h-5 transition-transform ${
                   isDropdownOpen ? "rotate-180" : ""
@@ -137,24 +228,27 @@ export default function UpcomingGames() {
               </svg>
             </button>
 
-            {/* Dropdown Menu */}
+            {/* Dropdown Menu with logos + hover color */}
             {isDropdownOpen && (
               <div className="absolute z-50 w-full sm:w-94 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
-                {leagueTabs.map((league) => {
-                  const isActive = selectedLeague === league;
+                {leagues.map((league) => {
+                  const Logo = league.logo;
                   return (
                     <button
-                      key={league}
+                      key={league.label}
                       onClick={() =>
-                        handleLeagueSelect(league as typeof selectedLeague)
+                        handleLeagueSelect(
+                          league.label as typeof selectedLeague
+                        )
                       }
-                      className={`w-full px-5 py-3 cursor-pointer text-left text-base font-semibold transition-colors ${
-                        isActive
-                          ? "bg-[#24257C] text-white"
-                          : "text-[#111827] hover:bg-gray-50"
-                      }`}
+                      className="group w-full px-5 py-3 cursor-pointer text-left transition-colors hover:bg-gray-50"
                     >
-                      {league}
+                      <span className="flex items-center gap-3">
+                        <Logo />
+                        <span className="font-semibold text-[#111827] transition-colors group-hover:text-[#278394]">
+                          {league.label}
+                        </span>
+                      </span>
                     </button>
                   );
                 })}
@@ -185,7 +279,6 @@ export default function UpcomingGames() {
                 })
               : game.kickoffTime ?? "TBD";
 
-            // Friendly odds strings with fallbacks
             const oddsDisplaySpread = game.odds?.spread ?? "-";
             const oddsDisplayTotal = game.odds?.total ?? "-";
             const oddsDisplayMoneyline = game.odds?.moneyline ?? "-";
@@ -198,12 +291,8 @@ export default function UpcomingGames() {
                 href={gameHref}
                 className="group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#24257C]"
               >
-                {/* 3px brand accent bar */}
                 <div className="h-[3px] w-full bg-[#24257C]" />
-
-                {/* Card body */}
                 <div className="p-5">
-                  {/* Meta row */}
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
                     <span className="px-2 py-1 rounded-md bg-gray-50 border border-gray-200 font-medium">
                       {game.league}
@@ -211,9 +300,7 @@ export default function UpcomingGames() {
                     <span className="font-medium">{kickoffLabel}</span>
                   </div>
 
-                  {/* Teams row */}
                   <div className="flex items-center justify-between gap-4 mb-5">
-                    {/* Away */}
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
                         {game.awayTeam.logo}
@@ -227,15 +314,11 @@ export default function UpcomingGames() {
                         </p>
                       </div>
                     </div>
-
-                    {/* VS */}
                     <div className="px-2">
                       <span className="text-sm font-semibold text-gray-400">
                         vs
                       </span>
                     </div>
-
-                    {/* Home */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
                       <div className="min-w-0 text-right">
                         <p className="font-semibold text-[15px] text-[#111827] truncate">
@@ -249,7 +332,6 @@ export default function UpcomingGames() {
                     </div>
                   </div>
 
-                  {/* Odds block (matches screenshot: 3 columns with labels) */}
                   <div className="rounded-xl bg-gray-50 border border-gray-100">
                     <div className="grid grid-cols-3 divide-x divide-gray-100">
                       <div className="p-3 text-center">
@@ -279,7 +361,6 @@ export default function UpcomingGames() {
                     </div>
                   </div>
 
-                  {/* CTA */}
                   <div className="mt-4">
                     <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
                       Read Prediction

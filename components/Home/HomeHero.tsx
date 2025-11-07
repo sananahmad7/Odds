@@ -144,7 +144,7 @@ export default function Hero({ initialFeatured = [] }: HeroProps) {
         {!showSkeleton && (
           <>
             {/* label */}
-            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10">
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10  px-6 md:px-12 lg:px-16">
               <span className="inline-block px-4 py-2 rounded font-inter font-semibold tracking-wide uppercase text-xs md:text-sm bg-[#24257C] text-white">
                 Analysis of the Day
               </span>
@@ -191,8 +191,8 @@ export default function Hero({ initialFeatured = [] }: HeroProps) {
             )}
 
             {/* content */}
-            <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16">
-              <div className="max-w-4xl ml-2">
+            <div className="absolute  inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16">
+              <div className="max-w-4xl ml-2 ">
                 <span className="inline-block px-3 py-1 bg-white/90 text-[#111827] text-sm font-semibold font-inter rounded mb-4">
                   {hasData
                     ? current!.categories.find((c) =>

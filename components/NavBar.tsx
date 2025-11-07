@@ -1,8 +1,11 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { useSearch } from "@/components/providers/SearchProvider";
 
 const LeagueLogos = {
   NFL: () => (
@@ -71,28 +74,32 @@ const leagues = [
 ];
 
 function NavBar() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const { query, setQuery } = useSearch();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [deskLeagueOpen, setDeskLeagueOpen] = useState(false);
   const [mobileLeagueOpen, setMobileLeagueOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
-  // Only enable hover-open on devices that actually support hover (mouse)
+  // hover support detection for desktops
   const [supportsHover, setSupportsHover] = useState(false);
   useEffect(() => {
     const mql = window.matchMedia("(hover: hover) and (pointer: fine)");
     const update = () => setSupportsHover(mql.matches);
     update();
     mql.addEventListener?.("change", update);
-    // @ts-ignore - Safari fallback
+    // @ts-ignore (Safari)
     mql.addListener?.(update);
     return () => {
       mql.removeEventListener?.("change", update);
-      // @ts-ignore - Safari fallback
+      // @ts-ignore
       mql.removeListener?.(update);
     };
   }, []);
 
-  // Desktop dropdown: close on outside click/tap
+  // close desktop dropdown on outside click
   const leagueRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const onOutside = (e: MouseEvent | TouchEvent) => {
@@ -108,16 +115,32 @@ function NavBar() {
     };
   }, []);
 
-  // When closing mobile menu, also collapse its league section
+  // collapse league when mobile menu closes
   useEffect(() => {
     if (!mobileMenuOpen) setMobileLeagueOpen(false);
   }, [mobileMenuOpen]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
+  // --- NEW: jump to "Upcoming" when the search input is focused/clicked ---
+  const desktopInputRef = useRef<HTMLInputElement>(null);
+  const mobileInputRef = useRef<HTMLInputElement>(null);
+
+  const jumpToUpcoming = (which?: "desktop" | "mobile") => {
+    if (pathname !== "/") {
+      // navigate to home and anchor to #upcoming
+      router.push("/#upcoming");
+      // try to keep focus on the same input after nav
+      const ref = which === "mobile" ? mobileInputRef : desktopInputRef;
+      setTimeout(() => ref.current?.focus(), 150);
+      return;
     }
+    const el = document.getElementById("upcoming");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // also ensure we’re at "Upcoming" on submit
+    jumpToUpcoming();
   };
 
   return (
@@ -131,7 +154,7 @@ function NavBar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center">
-            {/* Home Link */}
+            {/* Home */}
             <Link
               href="/"
               className="text-[#111827] font-medium text-base hover:text-[#278394] transition-colors duration-300 relative group"
@@ -140,7 +163,7 @@ function NavBar() {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#278394] transition-all duration-300 group-hover:w-full" />
             </Link>
 
-            {/* League Dropdown (desktop) */}
+            {/* League Dropdown */}
             <div
               ref={leagueRef}
               className="relative py-5 px-10"
@@ -155,7 +178,7 @@ function NavBar() {
                 type="button"
                 aria-haspopup="menu"
                 aria-expanded={deskLeagueOpen}
-                onClick={() => setDeskLeagueOpen((v) => !v)} // click/tap toggle for touch/laptop
+                onClick={() => setDeskLeagueOpen((v) => !v)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -179,16 +202,16 @@ function NavBar() {
                   className="absolute top-full left-0 w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
                 >
                   {leagues.map((league) => {
-                    const LogoComponent = league.logo;
+                    const Logo = league.logo;
                     return (
                       <Link
                         key={league.href}
                         href={league.href}
                         role="menuitem"
-                        onClick={() => setDeskLeagueOpen(false)} // close after click
+                        onClick={() => setDeskLeagueOpen(false)}
                         className="flex items-center gap-3 px-4 py-3 text-[#111827] font-medium hover:bg-gray-50 hover:text-[#278394] transition-colors duration-200"
                       >
-                        <LogoComponent />
+                        <Logo />
                         <span>{league.label}</span>
                       </Link>
                     );
@@ -197,17 +220,20 @@ function NavBar() {
               )}
             </div>
 
-            {/* Search Bar */}
-            <form onSubmit={handleSearch} className="relative">
+            {/* Search Bar (desktop) */}
+            <form onSubmit={handleSearchSubmit} className="relative">
               <input
+                ref={desktopInputRef}
                 type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search games, teams..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => jumpToUpcoming("desktop")}
+                onClick={() => jumpToUpcoming("desktop")}
                 className="w-64 px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent transition-all duration-300"
               />
               <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -257,13 +283,16 @@ function NavBar() {
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-gray-100 py-4 space-y-2">
             {/* Mobile Search */}
-            <form onSubmit={handleSearch} className="px-4 pb-3">
+            <form onSubmit={handleSearchSubmit} className="px-4 pb-3">
               <div className="relative">
                 <input
+                  ref={mobileInputRef}
                   type="text"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search games, teams..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onFocus={() => jumpToUpcoming("mobile")}
+                  onClick={() => jumpToUpcoming("mobile")}
                   className="w-full px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#278394] focus:border-transparent"
                 />
                 <svg
@@ -309,7 +338,7 @@ function NavBar() {
               {mobileLeagueOpen && (
                 <div className="bg-gray-50">
                   {leagues.map((league) => {
-                    const LogoComponent = league.logo;
+                    const Logo = league.logo;
                     return (
                       <Link
                         key={league.href}
@@ -320,7 +349,7 @@ function NavBar() {
                         }}
                         className="flex items-center gap-3 pl-8 pr-4 py-3 text-[#111827] font-medium hover:bg-gray-100 hover:text-[#278394] transition-colors duration-200"
                       >
-                        <LogoComponent />
+                        <Logo />
                         <span>{league.label}</span>
                       </Link>
                     );
