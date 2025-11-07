@@ -1,34 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+/** Read ?next=... safely on the client without useSearchParams (no Suspense needed) */
+function useNextPath(defaultPath = "/admin/blogs") {
+  const [nextPath, setNextPath] = useState(defaultPath);
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const n = sp.get("next");
+      if (n && n.startsWith("/")) setNextPath(n);
+    } catch {
+      /* noop */
+    }
+  }, []);
+  return nextPath;
+}
+
 export default function LoginPage() {
+  const router = useRouter();
+  const nextPath = useNextPath("/admin/blogs");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const router = useRouter();
-  const params = useSearchParams();
-  const next = params.get("next") || "/admin/blogs";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMsg(null);
     setLoading(true);
     try {
+      // Your /api/admin/login must set the HTTP-only cookie on success
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        // same-origin, so credentials not needed explicitly for Set-Cookie to work
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error || "Login failed");
-      router.replace(next);
+
+      // ✅ Navigate after cookie is set
+      router.replace(nextPath);
     } catch (err: any) {
-      setMsg(err.message || "Login failed");
+      setMsg(err?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -58,6 +77,7 @@ export default function LoginPage() {
             </label>
             <input
               type="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -73,6 +93,7 @@ export default function LoginPage() {
             <div className="mt-1 relative">
               <input
                 type={showPw ? "text" : "password"}
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

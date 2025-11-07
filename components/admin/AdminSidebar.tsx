@@ -168,7 +168,7 @@ function Footer({ onLogout }: { onLogout: () => void }) {
     <div className="p-4 border-t border-gray-800 bg-black">
       <button
         onClick={onLogout}
-        className="group w-full inline-flex items-center justify-center gap-3 rounded-xl bg-[#278394] px-4 py-3.5 text-base font-medium text-white font-poppins hover transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+        className="group cursor-pointer w-full inline-flex items-center justify-center gap-3 rounded-xl bg-[#278394] px-4 py-3.5 text-base font-medium text-white font-poppins hover transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
       >
         <MdLogout className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" />
         Logout
