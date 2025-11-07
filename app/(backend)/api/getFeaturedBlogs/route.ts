@@ -9,7 +9,7 @@ export async function GET() {
     const articles = await prisma.article.findMany({
       where: { isFeatured: true },
       orderBy: { publishedAt: "desc" },
-      take: 9, // keep in sync with your max featured cap
+      take: 3, // keep in sync with your max featured cap
       select: {
         id: true,
         slug: true,
