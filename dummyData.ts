@@ -484,13 +484,7 @@ export const navLinks: NavLink[] = [
 
 
 
-// ---------- Types ----------
-
-// types.ts (or alongside your dummy data)
-export type ArticleCategory = {
-  name: string;
-  slug: string;
-};
+export type League = "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC";
 
 export type ContentBlock = {
   type: "heading" | "subheading" | "text" | "image";
@@ -499,35 +493,31 @@ export type ContentBlock = {
 };
 
 export type BlogArticle = {
-  _id: string;
   slug: string;
   title: string;
   description: string;
-  thumbnail: string; // can be local path or external URL
-  categories: ArticleCategory[];
-  publishedAt: string; // ISO date
+  thumbnail: string; // Pexels images for all
+  league: League;    // ⬅️ replaces categories
+  publishedAt: string; // ISO
   isFeatured?: boolean;
   published: boolean;
   content: ContentBlock[];
 };
 
+// ---------- Articles (all published; exactly 3 featured) ----------
 export const blogArticles: BlogArticle[] = [
   // NFL
   {
-    _id: "a-nfl-1",
     slug: "why-the-49ers-are-undervalued-this-week",
     title: "Why the 49ers Are Undervalued This Week",
     description:
       "San Francisco could exploit a key matchup advantage on early downs. We break down the numbers and how to play it.",
     thumbnail:
       "https://images.pexels.com/photos/32911056/pexels-photo-32911056.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    categories: [
-      { name: "NFL", slug: "nfl" },
-      { name: "Analysis", slug: "analysis" },
-    ],
+    league: "NFL",
     publishedAt: "2025-01-02T15:10:00.000Z",
     isFeatured: false,
-    published: false,
+    published: true,
     content: [
       { type: "heading", content: "Matchup Overview" },
       {
@@ -561,19 +551,15 @@ export const blogArticles: BlogArticle[] = [
     ],
   },
   {
-    _id: "a-nfl-2",
     slug: "eagles-vs-cowboys-primer-odds-and-picks",
     title: "Eagles vs Cowboys Primer: Odds & Picks",
     description:
       "Updated lines, matchup edges, and our favorite prop angles for the NFC clash.",
     thumbnail:
       "https://images.pexels.com/photos/29424198/pexels-photo-29424198.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    categories: [
-      { name: "NFL", slug: "nfl" },
-      { name: "Picks", slug: "picks" },
-    ],
+    league: "NFL",
     publishedAt: "2025-01-03T12:00:00.000Z",
-    isFeatured: true,
+    isFeatured: true,   // ⭐ featured #1
     published: true,
     content: [
       { type: "heading", content: "How the Lines Moved" },
@@ -604,20 +590,16 @@ export const blogArticles: BlogArticle[] = [
 
   // NBA
   {
-    _id: "a-nba-1",
     slug: "best-bets-for-lakers-vs-nuggets",
     title: "Best Bets for Lakers vs Nuggets",
     description:
       "Our model favors Denver on the glass and pace. Here’s how that translates into value on the spread and total.",
     thumbnail:
       "https://images.pexels.com/photos/30555514/pexels-photo-30555514.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    categories: [
-      { name: "NBA", slug: "nba" },
-      { name: "Best Bets", slug: "best-bets" },
-    ],
+    league: "NBA",
     publishedAt: "2025-01-04T09:30:00.000Z",
-    isFeatured: true,
-    published: false,
+    isFeatured: true,   // ⭐ featured #2
+    published: true,
     content: [
       { type: "heading", content: "Glass Advantage" },
       {
@@ -645,16 +627,13 @@ export const blogArticles: BlogArticle[] = [
     ],
   },
   {
-    _id: "a-nba-2",
     slug: "knicks-defense-and-the-under-trend",
     title: "The Knicks’ Defense and the Under Trend",
     description:
       "Why New York’s drop coverage continues to cash unders against elite guards.",
-    thumbnail: "/ncaaf.jpg", // keep root-level path unchanged
-    categories: [
-      { name: "NBA", slug: "nba" },
-      { name: "Trends", slug: "trends" },
-    ],
+    thumbnail:
+      "https://images.pexels.com/photos/1301315/pexels-photo-1301315.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    league: "NBA",
     publishedAt: "2025-01-05T11:45:00.000Z",
     isFeatured: false,
     published: true,
@@ -682,19 +661,15 @@ export const blogArticles: BlogArticle[] = [
 
   // NCAAF
   {
-    _id: "a-ncaaf-1",
     slug: "betting-on-a-low-scoring-affair-in-the-sfc",
     title: "Betting on a Low-Scoring Affair in the SFC?",
     description:
       "Two top-10 defenses collide. We dig into pace, finishing drives, and red-zone rates.",
     thumbnail:
       "https://images.pexels.com/photos/15338952/pexels-photo-15338952.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    categories: [
-      { name: "NCAAF", slug: "ncaaf" },
-      { name: "Totals", slug: "totals" },
-    ],
+    league: "NCAAF",
     publishedAt: "2025-01-04T14:05:00.000Z",
-    isFeatured: true,
+    isFeatured: true,   // ⭐ featured #3
     published: true,
     content: [
       { type: "heading", content: "Pace & Possessions" },
@@ -720,17 +695,13 @@ export const blogArticles: BlogArticle[] = [
 
   // NCAAB
   {
-    _id: "a-ncaab-1",
     slug: "big-ten-clash-live-dog-on-the-road",
     title: "Big Ten Clash: Live Dog on the Road",
     description:
       "Tempo edge and rim defense point to value on the visiting side.",
     thumbnail:
       "https://images.pexels.com/photos/32965264/pexels-photo-32965264.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    categories: [
-      { name: "NCAAB", slug: "ncaab" },
-      { name: "Underdogs", slug: "underdogs" },
-    ],
+    league: "NCAAB",
     publishedAt: "2025-01-06T10:20:00.000Z",
     isFeatured: false,
     published: true,
@@ -758,17 +729,13 @@ export const blogArticles: BlogArticle[] = [
 
   // MLB
   {
-    _id: "a-mlb-1",
     slug: "strikeout-props-to-target-on-tuesday",
     title: "Strikeout Props to Target on Tuesday",
     description:
       "Pitcher whiff rates and opponent chase profiles highlight two plus-EV K props.",
     thumbnail:
       "https://images.pexels.com/photos/17724027/pexels-photo-17724027.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    categories: [
-      { name: "MLB", slug: "mlb" },
-      { name: "Props", slug: "props" },
-    ],
+    league: "MLB",
     publishedAt: "2025-01-07T08:00:00.000Z",
     isFeatured: false,
     published: true,
@@ -796,17 +763,13 @@ export const blogArticles: BlogArticle[] = [
 
   // UFC
   {
-    _id: "a-ufc-1",
     slug: "co-main-event-stylistic-breakdown",
     title: "Co-Main Event: Stylistic Breakdown",
     description:
       "Southpaw countering vs. wrestle-heavy pressure — who dictates terms in the pocket?",
     thumbnail:
       "https://images.pexels.com/photos/28560745/pexels-photo-28560745.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    categories: [
-      { name: "UFC", slug: "ufc" },
-      { name: "Breakdown", slug: "breakdown" },
-    ],
+    league: "UFC",
     publishedAt: "2025-01-08T18:30:00.000Z",
     isFeatured: false,
     published: true,
@@ -832,16 +795,13 @@ export const blogArticles: BlogArticle[] = [
     ],
   },
   {
-    _id: "a-ufc-2",
     slug: "three-underdogs-live-on-saturday",
     title: "Three Underdogs Live on Saturday",
     description:
       "Cardio durability and minute-winning tools make these dogs interesting.",
-    thumbnail: "/nba.jpg", // keep root-level path unchanged
-    categories: [
-      { name: "UFC", slug: "ufc" },
-      { name: "Underdogs", slug: "underdogs" },
-    ],
+    thumbnail:
+      "https://images.pexels.com/photos/4761663/pexels-photo-4761663.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    league: "UFC",
     publishedAt: "2025-01-08T20:10:00.000Z",
     isFeatured: false,
     published: true,
@@ -855,7 +815,7 @@ export const blogArticles: BlogArticle[] = [
       {
         type: "image",
         content:
-          "https://images.pexels.com/photos/4761663/pexels-photo-4761663.jpeg?auto=compress&cs=tinysrgb&w=1600",
+          "https://images.pexels.com/photos/4761797/pexels-photo-4761797.jpeg?auto=compress&cs=tinysrgb&w=1600",
         description: "Octagon control and cage wrestling exchanges.",
       },
       { type: "subheading", content: "Paths to Upsets" },

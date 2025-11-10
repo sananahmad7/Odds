@@ -1,10 +1,11 @@
+// app/(frontend)/page.tsx
 import HomeHero from "@/components/Home/HomeHero";
 import UpcomingGames from "@/components/Home/UpcomingGames";
 import { prisma } from "@/lib/prisma"; // see singleton below
 
 export default async function Home() {
   const articles = await prisma.article.findMany({
-    where: { isFeatured: true }, // only published featured
+    where: { isFeatured: true }, // only featured (adjust if you also want published: true)
     orderBy: { publishedAt: "desc" },
     take: 3,
     select: {
@@ -16,7 +17,7 @@ export default async function Home() {
       publishedAt: true,
       isFeatured: true,
       published: true,
-      categories: { select: { name: true, slug: true } },
+      league: true, // ⬅️ NEW: select league instead of categories
     },
   });
 
@@ -29,12 +30,12 @@ export default async function Home() {
     publishedAt: a.publishedAt.toISOString(),
     isFeatured: !!a.isFeatured,
     published: !!a.published,
-    categories: a.categories,
+    league: a.league, // ⬅️ NEW: pass league
   }));
+
   return (
     <main>
       <HomeHero initialFeatured={initialFeatured} />
-
       <UpcomingGames />
       <div className="h-20" />
     </main>

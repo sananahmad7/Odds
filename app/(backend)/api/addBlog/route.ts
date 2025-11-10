@@ -1,57 +1,88 @@
 // app/api/addArticle/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
-export const runtime = "nodejs";       // ✅ important
+export const runtime = "nodejs"; // ✅ important
+
+// Keep in sync with your Prisma enum
+const LEAGUES = new Set(["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "UFC"]);
 
 export async function POST(req: Request) {
-  const {
-    title,
-    slug,
-    description,
-    thumbnail,
-    publishDate,            // ISO string
-    metaTags = [],          // default
-    categories = [],        // [{ name, slug }]
-    content = [],           // [{ type, content, description? }]
-    published = false,
-    isFeatured = false,     // <— include this vdvx 
-  } = await req.json();
-
-  if (!title || !description || !categories?.length || !content?.length || !publishDate) {
-    return NextResponse.json(
-      { message: "Please fill out all required fields." },
-      { status: 400 }
-    );
-  }
-
   try {
-    const categoryOps = categories.map((c: { name: string; slug: string }) => ({
-      where: { slug: c.slug },
-      create: { name: c.name, slug: c.slug },
-    }));
+    const body = await req.json().catch(() => ({}));
 
+    const {
+      title,
+      slug,
+      description,
+      thumbnail,
+      publishedAt,                 // ISO string (preferred)
+      publishDate,                 // legacy support
+      metaTags = [],
+      league,                      // ⬅️ required enum
+      content = [],                // [{ type, content, description? }]
+      published = false,
+      isFeatured = false,          // keep supporting featured flag
+    } = body || {};
+
+    // Basic validation
+    if (!title || !slug || !description) {
+      return NextResponse.json(
+        { message: "Missing title, slug or description." },
+        { status: 400 }
+      );
+    }
+
+    if (!league || !LEAGUES.has(String(league))) {
+      return NextResponse.json(
+        { message: "Invalid or missing league." },
+        { status: 400 }
+      );
+    }
+
+    if (!Array.isArray(content) || content.length === 0) {
+      return NextResponse.json(
+        { message: "At least one content block is required." },
+        { status: 400 }
+      );
+    }
+
+    const whenISO = publishedAt ?? publishDate;
+    if (!whenISO) {
+      return NextResponse.json(
+        { message: "Missing publishedAt date." },
+        { status: 400 }
+      );
+    }
+    const when = new Date(whenISO);
+    if (Number.isNaN(when.getTime())) {
+      return NextResponse.json(
+        { message: "Invalid publishedAt date." },
+        { status: 400 }
+      );
+    }
+
+    // Build create payload (no categories anymore)
     const data = {
       title,
       slug,
       description,
       thumbnail,
-      publishedAt: new Date(publishDate),
+      publishedAt: when,
       published,
       isFeatured,
-      metaTags,
-      categories: { connectOrCreate: categoryOps },
+      metaTags: Array.isArray(metaTags) ? metaTags : [],
+      league, // enum value as string
       contentBlocks: {
-        // Prisma will replace on create; on update below we leave blocks unchanged
-        create: content.map((block: any, index: number) => ({
-          type: block.type,                // 'heading' | 'subheading' | 'text' | 'image'
-          content: block.content,
-          description: block.description || null,
+        create: (content as any[]).map((block, index) => ({
+          type: block.type,                     // 'heading' | 'subheading' | 'text' | 'image'
+          content: String(block.content ?? ""),
+          description: block.description ?? null,
           order: index,
         })),
       },
     } as const;
 
-    // Idempotent: if exists, update shallow fields (keep existing contentBlocks as-is)
+    // Idempotent upsert by slug
     const article = await prisma.article.upsert({
       where: { slug },
       create: data,
@@ -59,19 +90,22 @@ export async function POST(req: Request) {
         title,
         description,
         thumbnail,
-        publishedAt: new Date(publishDate),
+        publishedAt: when,
         published,
         isFeatured,
-        metaTags,
-        // NOTE: leaving categories/contentBlocks unchanged on update keeps it simple.
-        // If you want to re-sync categories or blocks, we can add logic for that.
+        metaTags: Array.isArray(metaTags) ? metaTags : [],
+        league,
+        // Note: contentBlocks left unchanged on update (same behavior as before).
       },
-      include: { categories: true, contentBlocks: true },
+      include: { contentBlocks: true },
     });
 
     return NextResponse.json(article, { status: 201 });
   } catch (error) {
     console.error("Error creating/updating article:", error);
-    return NextResponse.json({ message: "Failed to create/update the article." }, { status: 500 });
+    return NextResponse.json(
+      { message: "Failed to create/update the article." },
+      { status: 500 }
+    );
   }
 }

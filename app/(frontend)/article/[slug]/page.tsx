@@ -5,11 +5,7 @@ import Head from "next/head";
 import { format } from "date-fns";
 
 // Type definitions
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
+type League = "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC";
 
 interface ContentBlock {
   id: number;
@@ -28,7 +24,7 @@ interface Article {
   publishedAt: string;
   isFeatured: boolean | null;
   published: boolean;
-  categories: Category[];
+  league: League; // ⬅️ NEW (replaces categories)
   contentBlocks: ContentBlock[];
   metaTags: string[];
   createdAt: string;
@@ -200,24 +196,6 @@ export default function ArticlePage() {
       <div className="w-full">
         {/* Hero Section Skeleton */}
         <div className="relative h-screen w-full">
-          {/* Navbar Placeholder */}
-          {/* <div
-            className="fixed top-0 left-0 right-0 z-50"
-            style={{ backgroundColor: "rgba(36, 37, 124, 0.45)" }}
-          >
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-              <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
-              <div className="flex gap-4">
-                {[...Array(4)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-6 w-20 bg-gray-200 rounded animate-pulse"
-                  ></div>
-                ))}
-              </div>
-            </div>
-          </div> */}
-
           {/* Static Slide Skeleton */}
           <div className="relative h-full w-full overflow-hidden">
             <div className="absolute inset-0 w-full h-full">
@@ -228,15 +206,16 @@ export default function ArticlePage() {
               {/* Content Placeholder */}
               <div className="relative z-10 h-full flex items-end">
                 <div className="container mx-auto px-4 pb-16 md:pb-24">
-                  <div className="max-w-2xl space-y-4">
-                    <div className="h-6 w-24 bg-gray-200 rounded-sm animate-pulse"></div>
-                    <div className="h-12 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="max-w-2xl space-y-4 animate-pulse">
+                    <div className="h-6 w-40 bg-gray-200 rounded-sm"></div>
+                    <div className="h-12 w-3/4 bg-gray-200 rounded"></div>
                     <div className="space-y-2">
-                      <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-4 w-full bg-gray-200 rounded"></div>
+                      <div className="h-4 w-5/6 bg-gray-200 rounded"></div>
                     </div>
-                    <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-16 bg-gray-200 rounded"></div>
                   </div>
+                  <span className="sr-only">Loading article…</span>
                 </div>
               </div>
             </div>
@@ -251,14 +230,14 @@ export default function ArticlePage() {
           <div className="max-w-4xl mx-auto space-y-8">
             {[...Array(3)].map((_, index) => (
               <div key={index} className="space-y-4">
-                <div className="h-8 w-1/2 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-8 w-1/2 bg-gray-200 rounded"></div>
                 <div className="space-y-2">
-                  <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse"></div>
-                  <div className="h-4 w-4/5 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-4 w-full bg-gray-200 rounded"></div>
+                  <div className="h-4 w-5/6 bg-gray-200 rounded"></div>
+                  <div className="h-4 w-4/5 bg-gray-200 rounded"></div>
                 </div>
-                <div className="h-64 w-full bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse mx-auto"></div>
+                <div className="h-64 w-full bg-gray-200 rounded-lg"></div>
+                <div className="h-4 w-3/4 bg-gray-200 rounded mx-auto"></div>
               </div>
             ))}
           </div>
@@ -351,9 +330,8 @@ export default function ArticlePage() {
                     className="inline-block px-3 py-1 rounded-md text-sm mb-4"
                     style={{ backgroundColor: "#25818F" }}
                   >
-                    {article.categories.length > 0
-                      ? article.categories[0].name
-                      : "General"}
+                    {/* ⬇️ CHANGED: show league instead of categories */}
+                    {article.league || "General"}
                   </span>
 
                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
@@ -489,7 +467,7 @@ export default function ArticlePage() {
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.52a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
               </svg>
               Share on Twitter
             </a>

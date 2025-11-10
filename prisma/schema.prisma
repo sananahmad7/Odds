@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
@@ -14,15 +8,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Category model (for article tags/categories)
-model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  slug     String    @unique
-  articles Article[] @relation("ArticleCategories")
+enum ContentType {
+  heading
+  subheading
+  text
+  image
 }
 
-// Article model
+/**
+ * NEW League enum
+ */
+enum League {
+  NFL
+  NBA
+  NCAAF
+  NCAAB
+  MLB
+  UFC
+}
+
 model Article {
   id          Int      @id @default(autoincrement())
   slug        String   @unique
@@ -33,40 +37,34 @@ model Article {
   isFeatured  Boolean? @default(false)
   published   Boolean  @default(false)
 
-  // Many-to-many relation with Category
-  categories Category[] @relation("ArticleCategories")
+  /**
+   * NEW: league replaces categories
+   */
+  league League
 
-  // 1-to-many: ordered blocks of content
+  /**
+   * REMOVED: categories Category[] @relation("ArticleCategories")
+   */
+
   contentBlocks ArticleContent[]
-
-  // Meta tags as string array
-  metaTags String[] @default([])
+  metaTags      String[]         @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([league])
 }
 
-enum ContentType {
-  heading
-  subheading
-  text
-  image
-}
-
-// Individual content block of an article
 model ArticleContent {
   id          Int         @id @default(autoincrement())
   type        ContentType
   content     String
-  description String? // optional (for images/captions)
-  order       Int // 0-based index to preserve ordering
-
-  // FK to Article
-  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  description String?
+  order       Int
+  article     Article     @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId   Int
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([articleId, order])
 }

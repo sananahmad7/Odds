@@ -7,7 +7,7 @@ export async function GET() {
     const articles = await prisma.article.findMany({
       where: { isFeatured: true },
       orderBy: { publishedAt: "desc" },
-      take: 3, // keep in sync with your max featured cap
+      take: 3,
       select: {
         id: true,
         slug: true,
@@ -17,7 +17,7 @@ export async function GET() {
         publishedAt: true,
         isFeatured: true,
         published: true,
-        categories: { select: { name: true, slug: true } },
+        league: true, // ⬅️ NEW
       },
     });
 
@@ -30,7 +30,7 @@ export async function GET() {
       publishedAt: a.publishedAt.toISOString(),
       isFeatured: !!a.isFeatured,
       published: !!a.published,
-      categories: a.categories.map((c) => ({ name: c.name, slug: c.slug })),
+      league: a.league, // ⬅️ NEW
     }));
 
     return NextResponse.json(payload);

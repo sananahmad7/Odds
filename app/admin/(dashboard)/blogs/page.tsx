@@ -5,7 +5,8 @@ import Link from "next/link";
 
 type FilterKey = "all" | "published" | "draft";
 
-type CategoryChip = { name: string; slug: string };
+// NEW: League union (matches your Prisma enum)
+type League = "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC";
 
 // Final, normalized shape used by the UI
 type ApiBlog = {
@@ -14,7 +15,7 @@ type ApiBlog = {
   title: string;
   description: string;
   thumbnail: string | null;
-  categories: CategoryChip[];
+  league: League; // ⬅️ replaced categories[]
   isFeatured: boolean;
   published: boolean;
   publishedAt: string; // ISO
@@ -44,10 +45,20 @@ export default function AdminBlogsPage() {
       setLoading(true);
       setErrorMsg(null);
       try {
+        // NOTE: keep your existing path. If your API is under /api/v1/blog, change here accordingly.
         const res = await fetch("/api/getAllBlogs", { cache: "no-store" });
         if (!res.ok) throw new Error("Failed to load blogs");
 
         const raw: any[] = await res.json();
+
+        const ALLOWED: League[] = [
+          "NFL",
+          "NBA",
+          "NCAAF",
+          "NCAAB",
+          "MLB",
+          "UFC",
+        ];
 
         const safeData: ApiBlog[] = raw
           .map((b) => {
@@ -67,13 +78,19 @@ export default function AdminBlogsPage() {
               return null;
             }
 
+            // coerce league to our union
+            const leagueRaw = String(b.league ?? "").toUpperCase();
+            const league: League = (
+              ALLOWED.includes(leagueRaw as League) ? leagueRaw : "NFL"
+            ) as League;
+
             return {
               id: idNum,
               slug: String(b.slug ?? ""),
               title: String(b.title ?? ""),
               description: String(b.description ?? ""),
               thumbnail: b.thumbnail ?? "",
-              categories: Array.isArray(b.categories) ? b.categories : [],
+              league, // ⬅️ use league
               isFeatured: Boolean(b.isFeatured),
               published: Boolean(b.published),
               publishedAt: String(b.publishedAt ?? ""),
@@ -145,7 +162,6 @@ export default function AdminBlogsPage() {
     try {
       const res = await fetch(`/api/toggleFeatured/${id}`, { method: "PUT" });
 
-      // Handle API errors (including the 9-featured cap)
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         const msg = body?.error || "Failed to update featured status.";
@@ -153,7 +169,6 @@ export default function AdminBlogsPage() {
         return;
       }
 
-      // Update just the one card from server truth
       const updated: { id: number; isFeatured: boolean } = await res.json();
       setBlogs((prev) =>
         prev.map((b) =>
@@ -167,7 +182,6 @@ export default function AdminBlogsPage() {
     }
   };
 
-  // server-backed delete by numeric id
   const deleteBlog = async (id: number, title: string) => {
     if (!confirm(`Delete "${title}"?`)) return;
 
@@ -321,15 +335,11 @@ export default function AdminBlogsPage() {
                   )}
                 </p>
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {blog.categories.map((c) => (
-                    <span
-                      className="font-poppins text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700"
-                      key={c.slug}
-                    >
-                      {c.name}
-                    </span>
-                  ))}
+                {/* ⬇️ League pill (replaces categories chips) */}
+                <div className="mt-4">
+                  <span className="font-poppins text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                    {blog.league}
+                  </span>
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 gap-3">
@@ -342,7 +352,7 @@ export default function AdminBlogsPage() {
                     Visit
                   </Link>
                   <Link
-                    href={`/admin/addBlogs?edit=${blog.slug}`}
+                    href={`/admin/editBlog/${blog.slug}`}
                     className="font-poppins inline-flex items-center cursor-pointer justify-center gap-2 rounded-md bg-[#263E4D] text-white py-2.5 hover:bg-[#1a2834]"
                   >
                     <IconEdit />
