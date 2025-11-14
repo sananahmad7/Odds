@@ -23,72 +23,140 @@ moneyline?: MoneylineOdds;
 }
 
 export const upcomingGames: UpcomingGame[] = [
-{
-id: "32ec2bd4ac9e4c40f9f5cbed7e67f837",
-league: "NFL",
-kickoffIso: "2025-11-14T01:15:00Z",
-venue: "Gillette Stadium",
-awayTeam: { name: "New York Jets" },
-homeTeam: { name: "New England Patriots" },
-odds: {
-spread: { away: { point: 11.5, price: -110 }, home: { point: -11.5, price: -110 } },
-total: { point: 43.5, over: -110, under: -110 },
-moneyline: { away: 550, home: -720 },
-},
-},
-{
-id: "265f0188945bb81ec64751571eb724cb",
-league: "NFL",
-kickoffIso: "2025-11-16T14:30:00Z",
-venue: "Hard Rock Stadium",
-awayTeam: { name: "Washington Commanders" },
-homeTeam: { name: "Miami Dolphins" },
-odds: {
-spread: { away: { point: 3.0, price: -110 }, home: { point: -3.0, price: -105 } },
-total: { point: 47.5, over: -110, under: -110 },
-moneyline: { away: 135, home: -150 },
-},
-},
-{
-id: "0ae85bbc3711ad0cb94475a40e2364f0",
-league: "NFL",
-kickoffIso: "2025-11-16T18:00:00Z",
-venue: "Mercedes-Benz Stadium",
-awayTeam: { name: "Carolina Panthers" },
-homeTeam: { name: "Atlanta Falcons" },
-odds: {
-spread: { away: { point: 3.5, price: -110 }, home: { point: -3.5, price: -110 } },
-total: { point: 42.5, over: -110, under: -110 },
-moneyline: { away: 165, home: -190 },
-},
-},
-{
-id: "96377d2fb55e3cef733cecccdecaed5f",
-league: "NFL",
-kickoffIso: "2025-11-16T18:00:00Z",
-venue: "Highmark Stadium",
-awayTeam: { name: "Tampa Bay Buccaneers" },
-homeTeam: { name: "Buffalo Bills" },
-odds: {
-spread: { away: { point: 5.5, price: -110 }, home: { point: -5.5, price: -110 } },
-total: { point: 49.0, over: -110, under: -110 },
-moneyline: { away: 215, home: -250 },
-},
-},
-{
-id: "229a5e9ce60dcb344a8cc3c97121154e",
-league: "NFL",
-kickoffIso: "2025-11-16T18:00:00Z",
-venue: "U.S. Bank Stadium",
-awayTeam: { name: "Chicago Bears" },
-homeTeam: { name: "Minnesota Vikings" },
-odds: {
-spread: { away: { point: 3.0, price: -110 }, home: { point: -3.0, price: -110 } },
-total: { point: 48.5, over: -110, under: -110 },
-moneyline: { away: 140, home: -165 },
-},
-},
-]
+  {
+    id: "32ec2bd4ac9e4c40f9f5cbed7e67f837",
+    league: "NFL",
+    kickoffIso: "2025-11-14T01:15:00Z",
+    venue: "Gillette Stadium",
+    awayTeam: { name: "New York Jets" },
+    homeTeam: { name: "New England Patriots" },
+    odds: {
+      spread: { away: { point: 11.5, price: -110 }, home: { point: -11.5, price: -110 } },
+      total: { point: 43.5, over: -110, under: -110 },
+      moneyline: { away: 550, home: -720 },
+    },
+  },
+  {
+    id: "265f0188945bb81ec64751571eb724cb",
+    league: "NFL",
+    kickoffIso: "2025-11-16T14:30:00Z",
+    venue: "Hard Rock Stadium",
+    awayTeam: { name: "Washington Commanders" },
+    homeTeam: { name: "Miami Dolphins" },
+    odds: {
+      spread: { away: { point: 3.0, price: -110 }, home: { point: -3.0, price: -105 } },
+      total: { point: 47.5, over: -110, under: -110 },
+      moneyline: { away: 135, home: -150 },
+    },
+  },
+  {
+    id: "0ae85bbc3711ad0cb94475a40e2364f0",
+    league: "NFL",
+    kickoffIso: "2025-11-16T18:00:00Z",
+    venue: "Mercedes-Benz Stadium",
+    awayTeam: { name: "Carolina Panthers" },
+    homeTeam: { name: "Atlanta Falcons" },
+    odds: {
+      spread: { away: { point: 3.5, price: -110 }, home: { point: -3.5, price: -110 } },
+      total: { point: 42.5, over: -110, under: -110 },
+      moneyline: { away: 165, home: -190 },
+    },
+  },
+  {
+    id: "96377d2fb55e3cef733cecccdecaed5f",
+    league: "NFL",
+    kickoffIso: "2025-11-16T18:00:00Z",
+    venue: "Highmark Stadium",
+    awayTeam: { name: "Tampa Bay Buccaneers" },
+    homeTeam: { name: "Buffalo Bills" },
+    odds: {
+      spread: { away: { point: 5.5, price: -110 }, home: { point: -5.5, price: -110 } },
+      total: { point: 49.0, over: -110, under: -110 },
+      moneyline: { away: 215, home: -250 },
+    },
+  },
+  {
+    id: "229a5e9ce60dcb344a8cc3c97121154e",
+    league: "NFL",
+    kickoffIso: "2025-11-16T18:00:00Z",
+    venue: "U.S. Bank Stadium",
+    awayTeam: { name: "Chicago Bears" },
+    homeTeam: { name: "Minnesota Vikings" },
+    odds: {
+      spread: { away: { point: 3.0, price: -110 }, home: { point: -3.0, price: -110 } },
+      total: { point: 48.5, over: -110, under: -110 },
+      moneyline: { away: 140, home: -165 },
+    },
+  },
+
+  // ---- Added 5 more random games ----
+  {
+    id: "7f8a3d9b1e7c4a0db2ca1f9f8c3a5d10",
+    league: "NFL",
+    kickoffIso: "2025-11-16T21:05:00Z",
+    venue: "AT&T Stadium",
+    awayTeam: { name: "Philadelphia Eagles" },
+    homeTeam: { name: "Dallas Cowboys" },
+    odds: {
+      spread: { away: { point: 1.5, price: -105 }, home: { point: -1.5, price: -115 } },
+      total: { point: 51.5, over: -110, under: -110 },
+      moneyline: { away: 105, home: -125 },
+    },
+  },
+  {
+    id: "b3c5f2e4a19d4e0a86c2d1f3a7b9c6de",
+    league: "NFL",
+    kickoffIso: "2025-11-16T21:25:00Z",
+    venue: "Levi's Stadium",
+    awayTeam: { name: "New York Giants" },
+    homeTeam: { name: "San Francisco 49ers" },
+    odds: {
+      spread: { away: { point: 9.5, price: -110 }, home: { point: -9.5, price: -110 } },
+      total: { point: 45.0, over: -110, under: -110 },
+      moneyline: { away: 360, home: -480 },
+    },
+  },
+  {
+    id: "5c9130a2ef7d4a1b8c6de1f24ab9c7e1",
+    league: "NFL",
+    kickoffIso: "2025-11-16T18:00:00Z",
+    venue: "Acrisure Stadium",
+    awayTeam: { name: "Baltimore Ravens" },
+    homeTeam: { name: "Pittsburgh Steelers" },
+    odds: {
+      spread: { away: { point: -2.0, price: -112 }, home: { point: 2.0, price: -108 } },
+      total: { point: 41.5, over: -110, under: -110 },
+      moneyline: { away: -130, home: 115 },
+    },
+  },
+  {
+    id: "e2a4f6b8c0d94f13a7b2c6d1e9f38a75",
+    league: "NFL",
+    kickoffIso: "2025-11-16T18:00:00Z",
+    venue: "Lambeau Field",
+    awayTeam: { name: "New Orleans Saints" },
+    homeTeam: { name: "Green Bay Packers" },
+    odds: {
+      spread: { away: { point: 4.0, price: -110 }, home: { point: -4.0, price: -110 } },
+      total: { point: 44.5, over: -110, under: -110 },
+      moneyline: { away: 165, home: -190 },
+    },
+  },
+  {
+    id: "a18f0c2b9d3046d2b8c7e1f4a9c3d5e7",
+    league: "NFL",
+    kickoffIso: "2025-11-17T01:20:00Z",
+    venue: "Allegiant Stadium",
+    awayTeam: { name: "Kansas City Chiefs" },
+    homeTeam: { name: "Las Vegas Raiders" },
+    odds: {
+      spread: { away: { point: -7.0, price: -110 }, home: { point: 7.0, price: -110 } },
+      total: { point: 52.0, over: -110, under: -110 },
+      moneyline: { away: -300, home: 245 },
+    },
+  },
+];
+
 
 
 

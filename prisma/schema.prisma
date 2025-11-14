@@ -93,3 +93,72 @@ model ContactMessage {
 
   @@index([createdAt])
 }
+
+/////////// ODDS /////////////
+model OddsEvent {
+  id               String            @id
+  sportKey         String
+  sportTitle       String
+  commenceTime     DateTime
+  homeTeam         String
+  awayTeam         String
+  bookmakers       OddsBookmaker[]
+  eventpredictions Eventprediction[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now()) @updatedAt
+
+  @@index([commenceTime])
+}
+
+model OddsBookmaker {
+  id         String       @id @default(cuid())
+  eventId    String
+  key        String
+  title      String
+  lastUpdate DateTime
+  markets    OddsMarket[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now()) @updatedAt
+
+  event OddsEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, key]) // yields where: { eventId_key: { ... } }
+}
+
+model OddsMarket {
+  id          String        @id @default(cuid())
+  bookmakerId String
+  key         String
+  lastUpdate  DateTime
+  outcomes    OddsOutcome[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+
+  bookmaker OddsBookmaker @relation(fields: [bookmakerId], references: [id], onDelete: Cascade)
+
+  @@unique([bookmakerId, key]) // yields where: { bookmakerId_key: { ... } }
+}
+
+model OddsOutcome {
+  id        String   @id @default(cuid())
+  marketId  String
+  name      String
+  price     Int
+  point     Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  market OddsMarket @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  @@unique([marketId, name]) // yields where: { marketId_name: { ... } }
+}
+
+model Eventprediction {
+  id          Int       @id @default(autoincrement())
+  heading     String
+  description String
+  event       OddsEvent @relation(fields: [oddsEventId], references: [id])
+  oddsEventId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+}

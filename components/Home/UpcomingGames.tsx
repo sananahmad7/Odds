@@ -4,7 +4,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { Gamepad } from "lucide-react";
+import { FaFootballBall } from "react-icons/fa";
 import { upcomingGames } from "@/dummyData";
 import type { UpcomingGame } from "@/dummyData";
 
@@ -12,7 +12,7 @@ import type { UpcomingGame } from "@/dummyData";
 function TeamAvatar({ name }: { name: string }) {
   return (
     <span className="text-[#24257C]" aria-label={`${name} logo`}>
-      <Gamepad className="w-7 h-7" />
+      <FaFootballBall className="w-7 h-7" />
     </span>
   );
 }
@@ -389,9 +389,8 @@ export default function UpcomingGames() {
             const gameHref = `/game/${game.id}`;
 
             return (
-              <Link
+              <div
                 key={game.id}
-                href={gameHref}
                 className="group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#24257C]"
               >
                 <div className="h-[3px] w-full bg-[#24257C]" />
@@ -414,7 +413,7 @@ export default function UpcomingGames() {
                           {game.awayTeam.name}
                         </p>
                         <p className="text-xs text-gray-500 truncate font-inter">
-                          {game.venue || "Away"}
+                          {"Away"}
                         </p>
                       </div>
                     </div>
@@ -439,6 +438,9 @@ export default function UpcomingGames() {
                       <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
                         <TeamAvatar name={game.homeTeam.name} />
                       </div>
+                      <p className="text-xs text-gray-500 truncate font-inter">
+                        {game.venue || "Home"}
+                      </p>
                     </div>
                   </div>
 
@@ -515,12 +517,14 @@ export default function UpcomingGames() {
                   </div>
 
                   <div className="mt-4">
-                    <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
-                      Read Prediction
-                    </span>
+                    <Link href={`/prediction`}>
+                      <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
+                        Read Prediction
+                      </span>
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
