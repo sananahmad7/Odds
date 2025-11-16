@@ -110,7 +110,7 @@ function findTeamOutcome(outcomes: DbOutcome[] | undefined, team: string) {
 
 function mapDbEventToUiGame(e: DbOddsEvent): UpcomingGame {
   const book = pickBestBookmaker(e.bookmakers);
-  console.log(book);
+  // console.log(book);
   const h2h = getMarket(book, "h2h");
   const spreads = getMarket(book, "spreads");
   const totals = getMarket(book, "totals");

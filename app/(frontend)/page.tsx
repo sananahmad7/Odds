@@ -47,8 +47,8 @@ export default async function Home() {
   const baseUrl = getBaseUrl();
   const res = await fetch(`${baseUrl}/api/odds-data`, { cache: "no-store" });
   const events = res.ok ? await res.json() : [];
-  console.log(events);
-  console.log(events.length);
+  // console.log(events);
+  // console.log(events.length);
 
   return (
     <main>

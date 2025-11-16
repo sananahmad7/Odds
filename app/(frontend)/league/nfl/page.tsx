@@ -75,7 +75,7 @@ export default async function NFLLeaguePage() {
       })),
     })),
   }));
-  console.log("dbEvents", dbEvents.length, "dbEvents", dbEvents);
+  // console.log("dbEvents", dbEvents.length, "dbEvents", dbEvents);
   return (
     <div className="w-full bg-[#FAFAFA] min-h-screen">
       <section className="w-full bg-[#FAFAFA] py-12 sm:py-16">
