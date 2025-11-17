@@ -254,12 +254,12 @@ export default function GameCard({
 
             <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
               <span className="text-left">{pointText}</span>
-              <span className="text-right">
-                O {pointText}{" "}
+              <span className="text-right ml-12">
+                {pointText}{" "}
                 <span className="text-xs text-gray-600">{overText}</span>
               </span>
               <span className="text-right">
-                U {pointText}{" "}
+                {pointText}{" "}
                 <span className="text-xs text-gray-600">{underText}</span>
               </span>
             </div>
