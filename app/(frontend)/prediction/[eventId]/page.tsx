@@ -3,7 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 function getBaseUrl() {
-  return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const url =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.VERCEL_URL ||
+    "http://localhost:3000";
+
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
+    return `https://${url}`; // Vercel URLs are https
+  }
+
+  return url;
 }
 
 /* ===== Types matching /api/odds-detail response ===== */
