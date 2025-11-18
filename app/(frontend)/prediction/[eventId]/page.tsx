@@ -1,4 +1,3 @@
-// app/(frontend)/prediction/[eventId]/page.tsx
 import Article from "@/components/prediction/Article";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -46,17 +45,16 @@ export type DetailEvent = {
   eventpredictions: DetailPrediction[];
 };
 
-// Server-side data fetching directly in the component (without getServerSideProps)
+// Server-side data fetching
 const EventPredictionPage = async ({
   params,
 }: {
-  params: { eventId: string };
+  params: Promise<{ eventId: string }>; // UPDATED: params must be a Promise in Next.js 15+
 }) => {
   // Await the `params` promise
   const { eventId } = await params;
 
   if (!eventId) {
-    // Return an error message if eventId is missing
     return (
       <div className="text-center">
         <p>No event ID provided in the URL.</p>
@@ -67,7 +65,7 @@ const EventPredictionPage = async ({
   try {
     // Fetch the event data using Prisma directly
     const eventData = await prisma.oddsEvent.findUnique({
-      where: { id: eventId }, // Ensure eventId is passed correctly as the `id`
+      where: { id: eventId },
       include: {
         bookmakers: {
           include: {
@@ -83,39 +81,36 @@ const EventPredictionPage = async ({
     });
 
     if (!eventData) {
-      // Handle case where no event is found for the provided eventId
-      return notFound(); // Redirect to a 404 page if no data is found
+      return notFound();
     }
 
     // Map event data and convert `commenceTime` to string
     const formattedEventData: DetailEvent = {
       ...eventData,
-      commenceTime: eventData.commenceTime.toISOString(), // Convert Date to string
+      commenceTime: eventData.commenceTime.toISOString(),
       bookmakers: eventData.bookmakers.map((bookmaker) => ({
         ...bookmaker,
-        lastUpdate: bookmaker.lastUpdate.toISOString(), // Convert Date to string
+        lastUpdate: bookmaker.lastUpdate.toISOString(),
         markets: bookmaker.markets.map((market) => ({
           ...market,
-          lastUpdate: market.lastUpdate.toISOString(), // Convert Date to string
+          lastUpdate: market.lastUpdate.toISOString(),
           outcomes: market.outcomes.map((outcome) => ({
             ...outcome,
-            point: outcome.point ?? null, // Ensure `point` is properly typed
+            point: outcome.point ?? null,
           })),
         })),
       })),
       eventpredictions: eventData.eventpredictions.map((prediction) => ({
         ...prediction,
-        createdAt: prediction.createdAt.toISOString(), // Convert Date to string
-        updatedAt: prediction.updatedAt.toISOString(), // Convert Date to string
+        createdAt: prediction.createdAt.toISOString(),
+        updatedAt: prediction.updatedAt.toISOString(),
       })),
     };
 
-    // Return the server-rendered component with the formatted data
     return (
       <main className="w-full bg-[#FAFAFA] min-h-screen">
         <section className="w-full py-10 sm:py-14">
           <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-            {/* Pass the formatted data to the Article component */}
             <Article event={formattedEventData} />
           </div>
         </section>
