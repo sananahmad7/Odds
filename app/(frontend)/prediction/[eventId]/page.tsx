@@ -37,6 +37,7 @@ export type DetailPrediction = {
 export type DetailEvent = {
   id: string;
   sportKey: string;
+
   sportTitle: string;
   commenceTime: string;
   homeTeam: string;

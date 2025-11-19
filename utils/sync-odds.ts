@@ -352,10 +352,12 @@ async function upsertOddsPayload(events: ApiEvent[]) {
 
 // delete events whose commenceTime has passed
 async function prunePastEvents() {
-  await prisma.oddsEvent.deleteMany({
+  await prisma.eventprediction.deleteMany({
     where: {
-      commenceTime: {
-        lt: new Date(), // anything before "now"
+      event: {
+        commenceTime: {
+          lt: new Date(), // anything before "now"
+        },
       },
     },
   });
