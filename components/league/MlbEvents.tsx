@@ -140,7 +140,9 @@ export default function LeagueEventsMLB({ events }: Props) {
     <>
       {/* Header search (league title is rendered in the page) */}
       <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <div />
+        <h1 className="text-xl font-bold text-[#111827] font-inter">
+          Browse Upcoming MLB Games
+        </h1>
         <form
           onSubmit={(e) => e.preventDefault()}
           className="relative w-full sm:w-auto"

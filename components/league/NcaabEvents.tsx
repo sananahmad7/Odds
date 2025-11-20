@@ -140,7 +140,9 @@ export default function LeagueEventsNCAAB({ events }: Props) {
     <>
       {/* Header search (league title is rendered in the page) */}
       <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 font-playfair">
-        <h2 className="text-2xl font-bold text-[#111827] ">NCAAB</h2>
+        <h1 className="text-xl font-bold text-[#111827] font-inter">
+          Browse Upcoming NCAAB Games
+        </h1>{" "}
         <form
           onSubmit={(e) => e.preventDefault()}
           className="relative w-full sm:w-auto"
