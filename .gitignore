@@ -19,7 +19,7 @@ ok.tsx
 
 # production
 /build
-
+ok.ts
 # misc
 .DS_Store
 *.pem

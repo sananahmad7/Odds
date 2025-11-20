@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FaFootballBall } from "react-icons/fa";
@@ -127,6 +128,9 @@ export default function GameCard({
   predictionHref,
   className = "",
 }: GameCardProps) {
+  const [awayLogoVisible, setAwayLogoVisible] = useState(true);
+  const [homeLogoVisible, setHomeLogoVisible] = useState(true);
+
   const kickoffTs = getKickoffTimestampFromGame(game);
   const kickoffLabel = Number.isFinite(kickoffTs)
     ? new Date(kickoffTs).toLocaleString(undefined, {
@@ -161,19 +165,23 @@ export default function GameCard({
           </span>
           <span className="font-medium">{kickoffLabel}</span>
         </div>
+
         {/* Teams row */}
         <div className="flex items-center justify-between gap-4 mb-5">
           {/* Away */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-              <Image
-                src={`/${game.league}/${game.awayTeam.name}.png`}
-                alt={`${game.league}/${game.league}.png`}
-                width={44}
-                height={44}
-                className="w-15 h-15 object-contain"
-              />
-            </div>
+            {awayLogoVisible && (
+              <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
+                <Image
+                  src={`/${game.league}/${game.awayTeam.name}.png`}
+                  alt={`${game.awayTeam.name} logo`}
+                  width={44}
+                  height={44}
+                  className="w-15 h-15 object-contain"
+                  onError={() => setAwayLogoVisible(false)}
+                />
+              </div>
+            )}
             <div className="min-w-0">
               <p className="font-semibold text-[15px] text-[#111827] truncate">
                 {game.awayTeam.name}
@@ -195,15 +203,18 @@ export default function GameCard({
               </p>
               <p className="text-xs text-gray-500 truncate font-inter">Home</p>
             </div>
-            <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
-              <Image
-                src={`/${game.league}/${game.homeTeam.name}.png`}
-                alt={`${game.homeTeam.name} logo`}
-                width={44}
-                height={44}
-                className="w-15 h-15 object-contain"
-              />
-            </div>
+            {homeLogoVisible && (
+              <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
+                <Image
+                  src={`/${game.league}/${game.homeTeam.name}.png`}
+                  alt={`${game.homeTeam.name} logo`}
+                  width={44}
+                  height={44}
+                  className="w-15 h-15 object-contain"
+                  onError={() => setHomeLogoVisible(false)}
+                />
+              </div>
+            )}
           </div>
         </div>
 
