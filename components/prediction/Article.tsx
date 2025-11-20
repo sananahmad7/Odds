@@ -372,18 +372,6 @@ const Article = ({ event }: ArticleProps) => {
             )}
           </div>
         </div>
-
-        {/* --- Disclaimer Footer --- */}
-        <div className="border-t-2 border-gray-200 pt-8 pb-12">
-          <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200">
-            <p className="text-xs text-gray-600 leading-relaxed text-center">
-              <span className="font-bold text-gray-700">Disclaimer:</span> All
-              predictions and betting analysis are for informational purposes
-              only. Please gamble responsibly and within your means. Odds are
-              subject to change.
-            </p>
-          </div>
-        </div>
       </div>
     </article>
   );

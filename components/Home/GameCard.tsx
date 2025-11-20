@@ -168,7 +168,7 @@ export default function GameCard({
             <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
               <Image
                 src={`/${game.league}/${game.awayTeam.name}.png`}
-                alt={`${game.homeTeam.name} logo`}
+                alt={`${game.league}/${game.league}.png`}
                 width={44}
                 height={44}
                 className="w-15 h-15 object-contain"

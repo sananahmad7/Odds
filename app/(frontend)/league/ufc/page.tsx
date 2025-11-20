@@ -35,7 +35,7 @@ export type SerializableOddsEvent = {
 export default async function UFCLeaguePage() {
   // Pull ONLY UFC events from DB
   const dbEvents = await prisma.oddsEvent.findMany({
-    where: { sportTitle: "UFC" },
+    where: { sportTitle: "MMA" },
     include: {
       bookmakers: {
         include: {
@@ -79,7 +79,7 @@ export default async function UFCLeaguePage() {
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
           <div className="mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
-              UFC — All Upcoming Events
+              MMA — All Upcoming Events
             </h1>
             <p className="mt-2 text-base sm:text-lg text-gray-600 font-inter">
               Complete schedule and odds

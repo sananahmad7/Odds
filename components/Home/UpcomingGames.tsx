@@ -31,7 +31,7 @@ type DbBookmaker = {
 type DbOddsEvent = {
   id: string;
   sportKey: string;
-  sportTitle: "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "UFC" | string;
+  sportTitle: "NFL" | "NBA" | "NCAAF" | "NCAAB" | "MLB" | "MMA" | string;
   commenceTime: string; // ISO
   homeTeam: string;
   awayTeam: string;
@@ -213,7 +213,7 @@ const leagues = [
   { href: "/league/ncaaf", label: "NCAAF", logo: LeagueLogos.NCAAF },
   { href: "/league/ncaab", label: "NCAAB", logo: LeagueLogos.NCAAB },
   { href: "/league/mlb", label: "MLB", logo: LeagueLogos.MLB },
-  { href: "/league/ufc", label: "UFC", logo: LeagueLogos.UFC },
+  { href: "/league/ufc", label: "MMA", logo: LeagueLogos.UFC },
 ] as const;
 
 /* =======================
