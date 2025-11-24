@@ -34,6 +34,8 @@ export type SerializableOddsEvent = {
 
 export default async function NBALeaguePage() {
   // Pull ONLY NBA events from DB
+
+  const t0 = Date.now();
   const dbEvents = await prisma.oddsEvent.findMany({
     where: { sportTitle: "NBA" },
     include: {
@@ -45,6 +47,9 @@ export default async function NBALeaguePage() {
     },
     orderBy: { commenceTime: "asc" },
   });
+
+  const t1 = Date.now();
+  console.log("t1 - t0", t1 - t0);
 
   // Serialize dates for client component
   const events: SerializableOddsEvent[] = dbEvents.map((e) => ({
