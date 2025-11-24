@@ -73,6 +73,8 @@ export default async function Home() {
     })),
   }));
 
+  console.log("events", dbEvents);
+
   return (
     <main>
       <HomeHero initialFeatured={initialFeatured} />

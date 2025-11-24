@@ -15,15 +15,12 @@ export type DetailOutcome = {
 export type DetailMarket = {
   id: string;
   key: string;
-  lastUpdate: string;
   outcomes: DetailOutcome[];
 };
 
 export type DetailBookmaker = {
   id: string;
-  key: string;
   title: string;
-  lastUpdate: string;
   markets: DetailMarket[];
 };
 
@@ -32,8 +29,6 @@ export type DetailPrediction = {
   heading: string;
   description: string;
   oddsEventId: string;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type DetailEvent = {
@@ -77,28 +72,55 @@ const EventPredictionPage = async ({
   }
 
   try {
-    // 1) Fetch the main event + predictions + odds
+    // 1) Fetch the main event + predictions + odds (only fields the UI needs)
     const t0 = Date.now();
 
     const eventData = await prisma.oddsEvent.findUnique({
       where: { id: eventId },
-      include: {
+      select: {
+        id: true,
+        sportKey: true,
+        sportTitle: true,
+        commenceTime: true,
+        homeTeam: true,
+        awayTeam: true,
         bookmakers: {
-          include: {
+          take: 3,
+          select: {
+            id: true,
+            title: true,
             markets: {
-              include: {
-                outcomes: true,
+              where: {
+                key: { in: ["spreads", "h2h", "totals"] }, // only markets Article.tsx uses
+              },
+              select: {
+                id: true,
+                key: true,
+                outcomes: {
+                  select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                    point: true,
+                  },
+                },
               },
             },
           },
         },
-        eventpredictions: true,
+        eventpredictions: {
+          select: {
+            id: true,
+            heading: true,
+            description: true,
+            oddsEventId: true,
+          },
+        },
       },
     });
+
     console.log("[perf] oddsEvent query ms:", Date.now() - t0);
-
-    //console.log("eventData", eventData);
-
+    //console.log("[perf] eventData:", eventData);
     if (!eventData) {
       return notFound();
     }
@@ -124,6 +146,8 @@ const EventPredictionPage = async ({
     }[] = [];
 
     if (allowedLeagues.includes(leagueKey as (typeof allowedLeagues)[number])) {
+      const t1 = Date.now();
+
       relatedArticlesRaw = await prisma.article.findMany({
         where: {
           league: leagueKey as any, // cast to Prisma enum
@@ -142,29 +166,14 @@ const EventPredictionPage = async ({
         },
         take: 10,
       });
+      console.log("[perf] article query ms:", Date.now() - t1);
     }
 
-    // 3) Map event data and convert dates to strings
+    // 3) Map event data and convert only what the frontend actually needs
     const formattedEventData: DetailEvent = {
       ...eventData,
       commenceTime: eventData.commenceTime.toISOString(),
-      bookmakers: eventData.bookmakers.map((bookmaker) => ({
-        ...bookmaker,
-        lastUpdate: bookmaker.lastUpdate.toISOString(),
-        markets: bookmaker.markets.map((market) => ({
-          ...market,
-          lastUpdate: market.lastUpdate.toISOString(),
-          outcomes: market.outcomes.map((outcome) => ({
-            ...outcome,
-            point: outcome.point ?? null,
-          })),
-        })),
-      })),
-      eventpredictions: eventData.eventpredictions.map((prediction) => ({
-        ...prediction,
-        createdAt: prediction.createdAt.toISOString(),
-        updatedAt: prediction.updatedAt.toISOString(),
-      })),
+      // bookmakers + eventpredictions are already in the exact shape of DetailBookmaker/DetailPrediction
     };
 
     // 4) Format related articles (convert Date -> string)
