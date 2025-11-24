@@ -1,45 +1,94 @@
-import UpcomingGames from "./UpcomingGames";
+// components/Home/UpcomingGamesSection.tsx
 
-// Helper to determine the absolute URL required for server-side fetching
-const getBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return "http://localhost:3000";
-};
+import UpcomingGames from "./UpcomingGames";
+import { prisma } from "@/lib/prisma";
+
+const LEAGUES = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "MMA"] as const;
 
 export default async function FetchUpcomingGamesSection() {
+  const now = new Date();
   const t1 = Date.now();
-  const baseUrl = getBaseUrl();
 
-  // Next.js Server Components require an absolute URL.
-  // We use the 'next' option to handle caching.
-  // revalidate: 60 means the cache will persist for 60 seconds across all users.
-  const response = await fetch(`${baseUrl}/api/odds-data`, {
-    method: "GET",
-    next: {
-      revalidate: 60,
-      tags: ["odds-data"],
-    },
-    cache: "no-cache",
-  });
-
-  if (!response.ok) {
-    console.error("Failed to fetch odds data", response.statusText);
-    // You might want to return null or an error UI here
-    return <div>Error loading upcoming games.</div>;
-  }
-
-  const events = await response.json();
-
-  console.log(
-    "Time taken to fetch and parse API (Component):",
-    Date.now() - t1
+  const perLeague = await Promise.all(
+    LEAGUES.map((league) =>
+      prisma.oddsEvent.findMany({
+        where: {
+          sportTitle: league,
+          commenceTime: { gte: now },
+        },
+        orderBy: { commenceTime: "asc" },
+        take: 6, // 6 upcoming events per league
+        select: {
+          id: true,
+          sportKey: true,
+          sportTitle: true,
+          commenceTime: true,
+          homeTeam: true,
+          awayTeam: true,
+          bookmakers: {
+            take: 3,
+            select: {
+              id: true,
+              key: true,
+              title: true,
+              lastUpdate: true,
+              markets: {
+                where: {
+                  key: { in: ["h2h", "spreads", "totals"] }, // only needed markets
+                },
+                select: {
+                  id: true,
+                  key: true,
+                  lastUpdate: true,
+                  outcomes: {
+                    select: {
+                      id: true,
+                      name: true,
+                      price: true,
+                      point: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+    )
   );
-  console.log("Total events returned (Component):", events.length);
+
+  console.log("Time taken to fetch events (home):", Date.now() - t1);
+
+  const dbEvents = perLeague.flat();
+
+  // Shape to the DbOddsEvent type that UpcomingGames expects (string dates)
+  const events = dbEvents.map((e) => ({
+    id: e.id,
+    sportKey: e.sportKey,
+    sportTitle: e.sportTitle,
+    commenceTime: e.commenceTime.toISOString(),
+    homeTeam: e.homeTeam,
+    awayTeam: e.awayTeam,
+    bookmakers: e.bookmakers.map((b) => ({
+      id: b.id,
+      key: b.key,
+      title: b.title,
+      lastUpdate: b.lastUpdate.toISOString(),
+      markets: b.markets.map((m) => ({
+        id: m.id,
+        key: m.key,
+        lastUpdate: m.lastUpdate.toISOString(),
+        outcomes: m.outcomes.map((o) => ({
+          id: o.id,
+          name: o.name,
+          price: o.price,
+          point: o.point ?? null,
+        })),
+      })),
+    })),
+  }));
+
+  console.log("Total events returned (home):", events.length);
 
   return <UpcomingGames events={events} />;
 }
