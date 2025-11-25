@@ -54,13 +54,13 @@ export async function handleOddsPrediction() {
     }
 
     for (const event of events) {
-      // Skip if prediction already exists for this event
+      // Check if prediction already exists for this event
       const existingPrediction = await prisma.eventprediction.findFirst({
         where: { oddsEventId: event.id },
-        select: { id: true },
+        select: { id: true, heading: true, description: true },
       });
-      if (existingPrediction) continue;
 
+      // Get the odds data for the event
       const oddsData = encode(event);
 
       const completion = await client.chat.completions.create({
@@ -147,20 +147,31 @@ ${oddsData}
         description,
       };
 
-      // Store prediction in DB for this event
-      await prisma.eventprediction.create({
-        data: {
-          heading: responseBody.heading,
-          description: responseBody.description,
-          oddsEventId: event.id,
-        },
-      });
+      // If a prediction already exists, update it; otherwise, create a new one
+      if (existingPrediction) {
+        await prisma.eventprediction.update({
+          where: { id: existingPrediction.id },
+          data: {
+            heading: responseBody.heading,
+            description: responseBody.description,
+          },
+        });
+      } else {
+        // Store a new prediction in DB for this event
+        await prisma.eventprediction.create({
+          data: {
+            heading: responseBody.heading,
+            description: responseBody.description,
+            oddsEventId: event.id,
+          },
+        });
+      }
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Predictions created successfully",
+        message: "Predictions processed successfully",
       },
       { status: 200 }
     );
