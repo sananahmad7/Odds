@@ -17,6 +17,10 @@ type ApiOddsEvent = {
 
 type LeagueFilter = "ALL" | string;
 
+// ✅ Base leagues that should always appear in the filter,
+// even if there are currently no events for them.
+const BASE_LEAGUES = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "UFC"];
+
 export default function AdminOddsEventsPage() {
   const [events, setEvents] = useState<ApiOddsEvent[]>([]);
   const [loading, setLoading] = useState(false);
@@ -67,9 +71,9 @@ export default function AdminOddsEventsPage() {
     fetchEvents();
   }, []);
 
-  // derive league options from the data
+  // derive league options from the data + always include base leagues
   const leagueOptions = useMemo(() => {
-    const set = new Set<string>();
+    const set = new Set<string>(BASE_LEAGUES);
     events.forEach((e) => {
       if (e.sportTitle) set.add(e.sportTitle);
     });
@@ -171,15 +175,15 @@ export default function AdminOddsEventsPage() {
       </p>
 
       {/* League filter */}
-      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-8">
-        <div className="w-full sm:w-64">
+      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-8 ">
+        <div className="w-full sm:w-63">
           <label className="block text-sm font-poppins text-gray-700 mb-2">
             Filter by League (sportTitle)
           </label>
           <select
             value={leagueFilter}
             onChange={(e) => setLeagueFilter(e.target.value as LeagueFilter)}
-            className="w-full font-poppins p-3 border-2 border-gray-200 rounded-lg"
+            className="w-full font-poppins pl-1 py-3 border-2 border-gray-200 rounded-lg"
           >
             <option value="ALL">All Leagues</option>
             {leagueOptions.map((lv) => (
@@ -250,22 +254,8 @@ export default function AdminOddsEventsPage() {
                     </h3>
                   </div>
 
-                  <p className="font-poppins text-xs text-gray-600">
-                    ID:{" "}
-                    <span className="font-mono break-all">
-                      {truncate(ev.id, 70)}
-                    </span>
-                  </p>
-
                   {/* Image info + uploader */}
                   <div className="mt-3">
-                    <label className="block text-xs font-poppins text-gray-700 mb-1">
-                      Current Image URL
-                    </label>
-                    <p className="font-mono text-[11px] text-gray-500 break-all bg-gray-50 border rounded px-2 py-1 mb-2">
-                      {ev.image || "No image set yet"}
-                    </p>
-
                     <input
                       id={inputId}
                       type="file"
