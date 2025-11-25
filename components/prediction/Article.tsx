@@ -210,6 +210,21 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
             </p>
           </header>
 
+          {/* 🔥 Hero image from OddsEvent.image (Cloudinary) */}
+          {event.image && event.image.trim().length > 0 && (
+            <div className="mb-8">
+              <div className="relative w-full h-56 sm:h-72 md:h-80 lg:h-96 rounded-2xl overflow-hidden bg-gray-100">
+                <Image
+                  src={event.image}
+                  alt={`${event.awayTeam} vs ${event.homeTeam}`}
+                  fill
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 66vw, 100vw"
+                />
+              </div>
+            </div>
+          )}
+
           {/* Odds Card */}
           {odds ? (
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">

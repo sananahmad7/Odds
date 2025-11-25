@@ -36,6 +36,7 @@ export type DetailEvent = {
   sportKey: string;
   sportTitle: string;
   commenceTime: string;
+  image: string;
   homeTeam: string;
   awayTeam: string;
   bookmakers: DetailBookmaker[];
@@ -82,6 +83,7 @@ const EventPredictionPage = async ({
         sportKey: true,
         sportTitle: true,
         commenceTime: true,
+        image: true,
         homeTeam: true,
         awayTeam: true,
         bookmakers: {

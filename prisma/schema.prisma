@@ -162,4 +162,6 @@ model Eventprediction {
   oddsEventId String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
+
+  @@index([oddsEventId]) // Create index on oddsEventId
 }
