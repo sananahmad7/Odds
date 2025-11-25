@@ -117,6 +117,7 @@ const EventPredictionPage = async ({
         },
       },
       eventpredictions: {
+        take: 1,
         select: {
           id: true,
           heading: true,
