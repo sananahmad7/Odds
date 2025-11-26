@@ -33,6 +33,7 @@ export type DbOddsEvent = {
   sportTitle: string;
   commenceTime: Date; // Keep as Date object
   homeTeam: string;
+  bookmakerName?: string;
   awayTeam: string;
   bookmakers: DbBookmaker[];
 };
@@ -47,6 +48,7 @@ type UpcomingGame = {
   awayTeam: { name: string };
   kickoffIso?: string;
   kickoffTs?: number;
+  bookmakerName?: string; // 👈 Pass through to GameCard
   odds?: {
     spread?: {
       home?: { point?: number | null; price?: number | null };
@@ -103,6 +105,8 @@ function mapDbEventToUiGame(e: DbOddsEvent): UpcomingGame {
 
   // 1. Pick Bookmaker
   const book = pickBestBookmaker(e.bookmakers);
+  const bookmakerName = book?.title; // 👈 string | undefined (no null)
+  console.log({ bookmakerName });
 
   // 2. Extract Markets
   const h2h = getMarket(book, "h2h");
@@ -122,6 +126,7 @@ function mapDbEventToUiGame(e: DbOddsEvent): UpcomingGame {
   return {
     id: e.id,
     league: e.sportTitle,
+    bookmakerName, // 👈 now part of the game object
     homeTeam: { name: e.homeTeam },
     awayTeam: { name: e.awayTeam },
     kickoffIso,

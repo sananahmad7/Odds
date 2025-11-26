@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaFootballBall } from "react-icons/fa";
 
 /** ---------- Local minimal type the card needs ---------- */
 type GameCardGame = {
@@ -11,6 +10,7 @@ type GameCardGame = {
   league: string;
   homeTeam: { name: string };
   awayTeam: { name: string };
+  bookmakerName?: string;
   venue?: string | null;
   kickoffIso?: string; // parent sets this = commenceTime
   commenceTime?: string; // optional if parent passes raw DB event
@@ -28,15 +28,6 @@ type GameCardGame = {
     moneyline?: { home?: number | null; away?: number | null };
   };
 };
-
-/** ---------- Team avatar: football icon only (no text logos) ---------- */
-function TeamAvatar({ name }: { name: string }) {
-  return (
-    <span className="text-[#24257C]" aria-label={`${name} logo`}>
-      <FaFootballBall className="w-7 h-7" />
-    </span>
-  );
-}
 
 /** ---------- Helpers (kept local so the card is fully reusable) ---------- */
 function getKickoffTimestampFromGame(game: GameCardGame): number {
@@ -152,6 +143,7 @@ export default function GameCard({
 
   // If parent didn't pass a href, default to the dynamic league route
   const href = predictionHref ?? `/prediction/${game.id}`;
+
   return (
     <div
       className={`group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#24257C] ${className}`}
@@ -286,6 +278,13 @@ export default function GameCard({
               </span>
             </div>
           </div>
+
+          {/* Bookmaker name (tiny, only if present) */}
+          {/* {game.bookmakerName && (
+            <div className="mt-4 border-t border-gray-200 text-[10px] text-gray-400 font-inter text-center">
+              Odds via {game.bookmakerName}
+            </div>
+          )} */}
         </div>
 
         {/* CTA */}
