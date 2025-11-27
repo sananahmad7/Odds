@@ -188,20 +188,6 @@ export default function AdminOddsEventsPage() {
         the <code>image</code> field.
       </p>
 
-      {/* Search Bar */}
-      <div className="mb-8">
-        <label className="block text-sm font-poppins text-gray-700 mb-2">
-          Search by Team Names
-        </label>
-        <input
-          type="text"
-          placeholder="Enter team name"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full font-poppins pl-1 py-3 border-2 border-gray-200 rounded-lg"
-        />
-      </div>
-
       {/* League filter */}
       <div className="flex flex-col md:flex-row md:items-end gap-4 mb-8">
         <div className="w-full sm:w-63">
@@ -222,7 +208,19 @@ export default function AdminOddsEventsPage() {
           </select>
         </div>
       </div>
-
+      {/* Search Bar */}
+      <div className="mb-8">
+        <label className="block text-sm font-poppins text-gray-700 mb-2">
+          Search by Team Names
+        </label>
+        <input
+          type="text"
+          placeholder="Enter team name"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-[255px] font-poppins pl-1 py-3 border-2 border-gray-200 rounded-lg"
+        />
+      </div>
       {/* States */}
       {loading ? (
         <div className="flex items-center gap-3 py-24 text-gray-500 font-poppins">
