@@ -290,10 +290,10 @@ export default function UpcomingGames({ events }: Props) {
         {/* --- Header Section --- */}
         <div className="mb-8 sm:mb-12 grid gap-4 sm:gap-6 md:grid-cols-[1fr_auto_auto] md:items-end">
           <div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 tracking-tight font-playfair">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 tracking-tight font-gtsuper">
               Upcoming Games
             </h2>
-            <p className="mt-2 text-base sm:text-lg text-slate-600 font-inter">
+            <p className="mt-2 text-base sm:text-lg text-slate-600 font-neue ">
               Lines, Prices and total for every game this week.
             </p>
           </div>
@@ -308,7 +308,7 @@ export default function UpcomingGames({ events }: Props) {
               placeholder="Search games..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full md:w-72 px-4 py-2 pl-10 text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#24257C] transition-all"
+              className="w-full md:w-72 px-4 py-2 pl-10 font-neue text-[#111827] bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#24257C] transition-all"
             />
             {/* Search Icon */}
             <svg
@@ -329,7 +329,7 @@ export default function UpcomingGames({ events }: Props) {
           {/* View All Button */}
           <Link
             href={`/league/${selectedLeague.toLowerCase()}`}
-            className="hidden md:inline-flex justify-self-start md:justify-self-end items-center cursor-pointer h-10 px-5 rounded-lg bg-[#24257C] text-white text-sm font-semibold hover:bg-[#C83495] transition"
+            className="hidden md:inline-flex justify-self-start font-neue md:justify-self-end items-center cursor-pointer h-10 px-5 rounded-lg bg-[#24257C] text-white text-sm font-semibold hover:bg-[#C83495] transition"
           >
             View All
           </Link>
@@ -342,7 +342,7 @@ export default function UpcomingGames({ events }: Props) {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="w-full md:w-94 cursor-pointer flex items-center justify-between px-5 py-3 bg-white border-2 border-gray-200 rounded-lg text-[#111827] font-semibold text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:ring-offset-2"
             >
-              <span className="flex items-center gap-3">
+              <span className="flex items-center font-neue font-bold gap-3">
                 <ActiveLogo />
                 <span>{selectedLeague}</span>
               </span>
@@ -377,7 +377,7 @@ export default function UpcomingGames({ events }: Props) {
                       className="group w-full px-5 py-3 cursor-pointer text-left transition-colors hover:bg-gray-50 flex items-center gap-3"
                     >
                       <Logo />
-                      <span className="font-semibold text-[#111827] transition-colors group-hover:text-[#278394]">
+                      <span className="font-semibold font-neue text-[#111827] transition-colors group-hover:text-[#278394]">
                         {league.label}
                       </span>
                     </button>
@@ -394,7 +394,7 @@ export default function UpcomingGames({ events }: Props) {
             displayedGames.map((game) => <GameCard key={game.id} game={game} />)
           ) : (
             <div className="col-span-full py-12 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
-              <p className="text-gray-500 font-inter">
+              <p className="text-gray-500 font-neue">
                 No upcoming games found for {selectedLeague}.
               </p>
             </div>

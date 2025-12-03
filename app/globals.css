@@ -14,6 +14,21 @@
 
 }
 
+/* globals.css */
+@font-face {
+  font-family: 'gtsuper';  /* This is the name you'll use in your className */
+  src: url('/fonts/GT Super Display Regular.otf') format('opentype'); /* Path to the .otf file in the public folder */
+  font-weight: normal;  /* Optional: Define the font weights if you have multiple */
+  font-style: normal;   /* Optional: Define the font style (normal, italic, etc.) */
+}
+
+@font-face {
+  font-family: 'neue';  /* This is the name you'll use in your className */
+  src: url('/fonts/neuehaasgrotlight-trial.otf') format('opentype'); /* Path to the .otf file in the public folder */
+  font-weight: normal;  /* Optional: Define the font weights if you have multiple */
+  font-style: normal;   /* Optional: Define the font style (normal, italic, etc.) */
+}
+
 
 
 body {
@@ -27,10 +42,16 @@ body {
   .font-playfair {
     font-family: var(--font-playfair);
   }
-
+ .font-gtsuper {
+    font-family: 'gtsuper', sans-serif; /* Fallback font */
+  }
   .font-inter {
     font-family: var(--font-inter);
   }
+   .font-neue {
+    font-family: 'neue', "inter"; 
+  }
+  
   .font-poppins {
   font-family: var(--font-poppins);
 }

@@ -141,11 +141,11 @@ export default function LeagueEventsNBA({ events }: Props) {
       {/* Header search (league title is rendered in the page) */}
       <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="mb-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
-            NBA — All Upcoming Games
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-gtsuper">
+            NBA Weekly Outlook
           </h1>
-          <p className="mt-2 text-base sm:text-lg text-gray-600 font-inter">
-            Complete schedule and odds
+          <p className="mt-2 text-base sm:text-lg text-gray-600 font-neue">
+            Every matchup. Every Edge. No Guesswork.
           </p>
         </div>
         <form
@@ -157,7 +157,7 @@ export default function LeagueEventsNBA({ events }: Props) {
             placeholder="Search teams..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-60  sm:w-72 2xl:w-80 px-4 py-2 pl-10 text-[#111827] bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:border-transparent transition-all duration-300"
+            className="w-60  sm:w-72 2xl:w-80 px-4 py-2 font-neue  pl-10 text-[#111827] bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#24257C] focus:border-transparent transition-all duration-300"
           />
           <svg
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -185,7 +185,7 @@ export default function LeagueEventsNBA({ events }: Props) {
           >
             <circle cx="12" cy="12" r="10" />
           </svg>
-          <p className="text-gray-500 text-lg font-inter">
+          <p className="text-gray-500 text-lg font-neue">
             No upcoming NBA games found
           </p>
         </div>

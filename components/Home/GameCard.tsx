@@ -157,7 +157,7 @@ export default function GameCard({
           <span className="px-2 py-1 rounded-md bg-gray-50 border border-gray-200 font-medium">
             {game.league}
           </span>
-          <span className="font-medium">{`${kickoffLabel} Central Time`}</span>
+          <span className="font-medium font-neue">{`${kickoffLabel} Central Time`}</span>
         </div>
 
         {/* Teams row */}
@@ -176,26 +176,28 @@ export default function GameCard({
                 />
               </div>
             )}
-            <div className="min-w-0">
-              <p className="font-semibold text-[15px] text-[#111827] truncate">
+            <div className="min-w-0 font-gtsuper">
+              <p className="font-semibold  text-[15px] text-[#111827] truncate">
                 {game.awayTeam.name}
               </p>
-              <p className="text-xs text-gray-500 truncate font-inter">Away</p>
+              <p className="text-xs text-gray-500 truncate font-neue">Away</p>
             </div>
           </div>
 
           {/* VS */}
           <div className="px-2">
-            <span className="text-sm font-semibold text-gray-400">vs</span>
+            <span className="text-sm font-semibold font-neue text-gray-400">
+              vs
+            </span>
           </div>
 
           {/* Home */}
           <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
-            <div className="min-w-0 text-right">
-              <p className="font-semibold text-[15px] text-[#111827] truncate">
+            <div className="min-w-0 font-gtsuper text-right">
+              <p className="font-semibold  text-[15px] text-[#111827] truncate">
                 {game.homeTeam.name}
               </p>
-              <p className="text-xs text-gray-500 truncate font-inter">Home</p>
+              <p className="text-xs text-gray-500 truncate font-neue">Home</p>
             </div>
             {homeLogoVisible && (
               <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
@@ -205,7 +207,7 @@ export default function GameCard({
                   width={44}
                   height={44}
                   className="w-15 h-15 object-contain"
-                  onError={() => setHomeLogoVisible(false)}
+                  onError={() => setHomeLogoVisible(false)} // Hide on error
                 />
               </div>
             )}
@@ -216,7 +218,7 @@ export default function GameCard({
         <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
           {/* Header for team odds */}
           <div
-            className={`${ODDS_GRID_TEAMS} text-[11px] uppercase tracking-wide text-gray-500 font-inter`}
+            className={`${ODDS_GRID_TEAMS} text-[11px] font-neue uppercase tracking-wide text-gray-500 font-inter`}
           >
             <span className="text-left">Team</span>
             <span className="text-left">Spread</span>
@@ -231,12 +233,12 @@ export default function GameCard({
                 {game.awayTeam.name}
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
                 {awayPointText}{" "}
                 <span className="text-xs text-gray-600">{awayPriceText}</span>
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
                 {awayMl}
               </span>
             </div>
@@ -247,12 +249,12 @@ export default function GameCard({
                 {game.homeTeam.name}
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
                 {homePointText}{" "}
                 <span className="text-xs text-gray-600">{homePriceText}</span>
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
                 {homeMl}
               </span>
             </div>
@@ -260,35 +262,33 @@ export default function GameCard({
 
           {/* Separate Total row */}
           <div className="mt-3 pt-3 border-t border-gray-200">
-            <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 font-inter mb-1">
+            <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 font-neue mb-1">
               <span className="text-left w-full">Game Total</span>
               <span className="text-center w-full">Over</span>
               <span className="text-right w-full">Under</span>
             </div>
 
-            <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-inter [font-variant-numeric:tabular-nums]">
+            <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
               <span className="text-left w-full">{pointText}</span>
               <span className="text-center w-full">
-                {pointText}{" "}
-                <span className="text-xs text-gray-600">{overText}</span>
+                <span className="text-sm text-gray-600">{overText}</span>
               </span>
               <span className="text-right w-full">
-                {pointText}{" "}
-                <span className="text-xs text-gray-600">{underText}</span>
+                <span className="text-sm text-gray-600">{underText}</span>
               </span>
             </div>
           </div>
 
           {/* Bookmaker name (tiny, only if present) */}
-          {/* {game.bookmakerName && (
-            <div className="mt-4 border-t border-gray-200 text-[10px] text-gray-400 font-inter text-center">
+          {game.bookmakerName && (
+            <div className="mt-4 border-t border-gray-200 font-neue text-[10px] text-gray-400 font-inter text-center">
               Odds via {game.bookmakerName}
             </div>
-          )} */}
+          )}
         </div>
 
         {/* CTA */}
-        <div className="mt-4">
+        <div className="mt-1">
           <Link href={href}>
             <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
               Read Prediction

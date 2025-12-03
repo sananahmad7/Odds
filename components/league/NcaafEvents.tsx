@@ -141,10 +141,10 @@ export default function LeagueEventsNCAAF({ events }: Props) {
       {/* Header search (league title is rendered in the page) */}
       <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="mb-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-playfair">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111827] tracking-tight font-gtsuper">
             NCAAF Weekly Outlook
           </h1>
-          <p className="mt-2 text-base sm:text-lg text-gray-600 font-inter">
+          <p className="mt-2 text-base sm:text-lg text-gray-600 font-neue">
             Every matchup. Every Edge. No Guesswork.
           </p>
         </div>
@@ -185,7 +185,7 @@ export default function LeagueEventsNCAAF({ events }: Props) {
           >
             <circle cx="12" cy="12" r="10" />
           </svg>
-          <p className="text-gray-500 text-lg font-inter">
+          <p className="text-gray-500 text-lg font-neue">
             No upcoming NCAAF games found
           </p>
         </div>

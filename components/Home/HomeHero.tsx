@@ -1,4 +1,3 @@
-// components/Home/HomeHero.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -132,7 +131,7 @@ export default function Hero({ articles = [] }: HeroProps) {
           <>
             {/* label */}
             <div className="absolute top-4  md:top-6 left-1 z-10  px-6 md:px-12 lg:px-16">
-              <span className="inline-block px-4 py-2 rounded font-inter font-semibold tracking-wide uppercase text-xs md:text-sm bg-[#24257C] text-white">
+              <span className="inline-block px-4 py-2 rounded font-neue font-semibold tracking-wide uppercase text-xs md:text-sm bg-[#24257C] text-white">
                 Analysis of the Day
               </span>
             </div>
@@ -181,18 +180,18 @@ export default function Hero({ articles = [] }: HeroProps) {
             <div className=" absolute  inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16">
               <div className="max-w-4xl ml-2 ">
                 {/* ⬅️ NEW: show league badge */}
-                <span className="inline-block px-3 py-1 bg-white/90 text-[#111827] text-sm font-semibold font-inter rounded mb-4">
+                <span className="inline-block px-3 py-1 bg-white/90 text-[#111827] text-sm font-semibold font-neue rounded mb-4">
                   {hasData ? current!.league : "SPORTS"}
                 </span>
 
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-playfair text-white mb-8 leading-tight">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-gtsuper text-white mb-8 leading-tight">
                   {hasData ? current!.title : "Loading analysis…"}
                 </h1>
 
                 <Link href={hasData ? `/article/${current!.slug}` : `#`}>
                   <button
                     disabled={!hasData}
-                    className="inline-block px-6 py-3 cursor-pointer bg-[#24257C] hover:bg-[#C83495] disabled:opacity-60 disabled:cursor-not-allowed text-white font-inter font-medium rounded transition-colors duration-300"
+                    className="inline-block px-6 py-3 cursor-pointer bg-[#24257C] hover:bg-[#C83495] disabled:opacity-60 disabled:cursor-not-allowed text-white font-gtsuper font-medium rounded transition-colors duration-300"
                   >
                     Read Analysis
                   </button>
