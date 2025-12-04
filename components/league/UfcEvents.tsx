@@ -145,7 +145,7 @@ export default function LeagueEventsUFC({ events }: Props) {
             UFC Weekly Outlook
           </h1>
           <p className="mt-2 text-base sm:text-lg text-gray-600 font-neue">
-            Complete schedule and odds
+            Every matchup. Every Edge. No Guesswork.
           </p>
         </div>
         <form

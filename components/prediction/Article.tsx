@@ -1,4 +1,4 @@
-// components/prediction/Article.tsx
+// Article.tsx
 "use client";
 
 import React, { useMemo, useState } from "react";
@@ -16,106 +16,6 @@ import type {
 type ArticleProps = {
   event: DetailEvent;
   relatedArticles?: RelatedArticle[];
-};
-
-type NormalizedOdds = {
-  bookmakerName: string;
-  home: {
-    name: string;
-    spread?: { point: string; price: string };
-    ml?: { price: string };
-  };
-  away: {
-    name: string;
-    spread?: { point: string; price: string };
-    ml?: { price: string };
-  };
-  total?: {
-    over?: { point: string; price: string };
-    under?: { point: string; price: string };
-  };
-};
-
-const getBestOdds = (event: DetailEvent): NormalizedOdds | null => {
-  if (!event.bookmakers || event.bookmakers.length === 0) return null;
-  const requiredMarkets = ["spreads", "h2h", "totals"];
-
-  // Find a bookmaker that has all 3 markets, or fallback to the first one
-  const bestBookmaker: DetailBookmaker =
-    event.bookmakers.find((book) => {
-      const availableKeys = book.markets.map((m) => m.key);
-      return requiredMarkets.every((k) => availableKeys.includes(k));
-    }) || event.bookmakers[0];
-
-  if (!bestBookmaker) return null;
-
-  const spreadMarket = bestBookmaker.markets.find((m) => m.key === "spreads");
-  const mlMarket = bestBookmaker.markets.find((m) => m.key === "h2h");
-  const totalMarket = bestBookmaker.markets.find((m) => m.key === "totals");
-
-  const getOutcome = (market: DetailMarket | undefined, name: string) =>
-    market?.outcomes.find((o) => o.name === name || name.includes(o.name));
-  const getTotal = (type: "Over" | "Under") =>
-    totalMarket?.outcomes.find((o) => o.name.includes(type));
-  const fmtPrice = (price: number) => (price > 0 ? `+${price}` : `${price}`);
-
-  return {
-    bookmakerName: bestBookmaker.title,
-    home: {
-      name: event.homeTeam,
-      spread: (() => {
-        const o = getOutcome(spreadMarket, event.homeTeam);
-        return o
-          ? {
-              point: o.point
-                ? o.point > 0
-                  ? `+${o.point}`
-                  : `${o.point}`
-                : "",
-              price: fmtPrice(o.price),
-            }
-          : undefined;
-      })(),
-      ml: (() => {
-        const o = getOutcome(mlMarket, event.homeTeam);
-        return o ? { price: fmtPrice(o.price) } : undefined;
-      })(),
-    },
-    away: {
-      name: event.awayTeam,
-      spread: (() => {
-        const o = getOutcome(spreadMarket, event.awayTeam);
-        return o
-          ? {
-              point: o.point
-                ? o.point > 0
-                  ? `+${o.point}`
-                  : `${o.point}`
-                : "",
-              price: fmtPrice(o.price),
-            }
-          : undefined;
-      })(),
-      ml: (() => {
-        const o = getOutcome(mlMarket, event.awayTeam);
-        return o ? { price: fmtPrice(o.price) } : undefined;
-      })(),
-    },
-    total: {
-      over: (() => {
-        const o = getTotal("Over");
-        return o
-          ? { point: `O ${o.point}`, price: fmtPrice(o.price) }
-          : undefined;
-      })(),
-      under: (() => {
-        const o = getTotal("Under");
-        return o
-          ? { point: `U ${o.point}`, price: fmtPrice(o.price) }
-          : undefined;
-      })(),
-    },
-  };
 };
 
 const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
@@ -137,6 +37,105 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
 
   const kickoffLabel = `${kickoffDateCT} • ${kickoffTimeCT} Central Time`;
 
+  type NormalizedOdds = {
+    bookmakerName: string;
+    home: {
+      name: string;
+      spread?: { point: string; price: string };
+      ml?: { price: string };
+    };
+    away: {
+      name: string;
+      spread?: { point: string; price: string };
+      ml?: { price: string };
+    };
+    total?: {
+      over?: { point: string; price: string };
+      under?: { point: string; price: string };
+    };
+  };
+  const getBestOdds = (event: DetailEvent): NormalizedOdds | null => {
+    if (!event.bookmakers || event.bookmakers.length === 0) return null;
+    const requiredMarkets = ["spreads", "h2h", "totals"];
+
+    // Find a bookmaker that has all 3 markets, or fallback to the first one
+    const bestBookmaker: DetailBookmaker =
+      event.bookmakers.find((book) => {
+        const availableKeys = book.markets.map((m) => m.key);
+        return requiredMarkets.every((k) => availableKeys.includes(k));
+      }) || event.bookmakers[0];
+
+    if (!bestBookmaker) return null;
+
+    const spreadMarket = bestBookmaker.markets.find((m) => m.key === "spreads");
+    const mlMarket = bestBookmaker.markets.find((m) => m.key === "h2h");
+    const totalMarket = bestBookmaker.markets.find((m) => m.key === "totals");
+
+    const getOutcome = (market: DetailMarket | undefined, name: string) =>
+      market?.outcomes.find((o) => o.name === name || name.includes(o.name));
+    const getTotal = (type: "Over" | "Under") =>
+      totalMarket?.outcomes.find((o) => o.name.includes(type));
+    const fmtPrice = (price: number) => (price > 0 ? `+${price}` : `${price}`);
+
+    return {
+      bookmakerName: bestBookmaker.title,
+      home: {
+        name: event.homeTeam,
+        spread: (() => {
+          const o = getOutcome(spreadMarket, event.homeTeam);
+          return o
+            ? {
+                point: o.point
+                  ? o.point > 0
+                    ? `+${o.point}`
+                    : `${o.point}`
+                  : "",
+                price: fmtPrice(o.price),
+              }
+            : undefined;
+        })(),
+        ml: (() => {
+          const o = getOutcome(mlMarket, event.homeTeam);
+          return o ? { price: fmtPrice(o.price) } : undefined;
+        })(),
+      },
+      away: {
+        name: event.awayTeam,
+        spread: (() => {
+          const o = getOutcome(spreadMarket, event.awayTeam);
+          return o
+            ? {
+                point: o.point
+                  ? o.point > 0
+                    ? `+${o.point}`
+                    : `${o.point}`
+                  : "",
+                price: fmtPrice(o.price),
+              }
+            : undefined;
+        })(),
+        ml: (() => {
+          const o = getOutcome(mlMarket, event.awayTeam);
+          return o ? { price: fmtPrice(o.price) } : undefined;
+        })(),
+      },
+      total: {
+        over: (() => {
+          const o = getTotal("Over");
+          return o
+            ? { point: `O ${o.point}`, price: fmtPrice(o.price) }
+            : undefined;
+        })(),
+        under: (() => {
+          const o = getTotal("Under");
+          return o
+            ? { point: `U ${o.point}`, price: fmtPrice(o.price) }
+            : undefined;
+        })(),
+      },
+    };
+  };
+  // Normalize odds
   const odds = useMemo(() => getBestOdds(event), [event]);
 
   // Logo visibility (same pattern as GameCard, but using local event data)
@@ -384,22 +383,38 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
             </div>
           )}
 
-          {/* Predictions / Analysis Section */}
+          {/* Predictions Section */}
           <section className="mb-8">
-            {event.eventpredictions.map(
-              (prediction: DetailPrediction, idx: number) => (
-                <div key={idx} className="mb-8">
-                  <h2 className="font-playfair text-2xl sm:text-3xl font-bold text-[#111827] mb-4 pb-2 border-b-2 border-[#C83495]">
-                    {prediction.heading}
-                  </h2>
-                  <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
-                    <p className="whitespace-pre-line">
-                      {prediction.description}
-                    </p>
-                  </div>
+            {event.eventpredictions.map((prediction, idx) => (
+              <div key={idx} className="mb-8">
+                <h2 className="font-gtsuper  text-2xl sm:text-3xl font-bold text-[#111827] mb-4 pb-2 border-b-2 border-[#C83495]">
+                  {prediction.article1Heading}
+                </h2>
+                <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
+                  <p className="whitespace-pre-line">
+                    {prediction.article1Description}
+                  </p>
                 </div>
-              )
-            )}
+
+                <h2 className="font-gtsuper text-2xl mt-4 sm:text-3xl font-bold text-[#111827] mb-4 pb-2 border-b-2 border-[#C83495]">
+                  {prediction.article2Heading}
+                </h2>
+                <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
+                  <p className="whitespace-pre-line">
+                    {prediction.article2Description}
+                  </p>
+                </div>
+
+                <h2 className="font-gtsuper text-2xl mt-4 sm:text-3xl font-bold text-[#111827] mb-4 pb-2 border-b-2 border-[#C83495]">
+                  {prediction.article3Heading}
+                </h2>
+                <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
+                  <p className="whitespace-pre-line">
+                    {prediction.article3Description}
+                  </p>
+                </div>
+              </div>
+            ))}
           </section>
         </div>
 
