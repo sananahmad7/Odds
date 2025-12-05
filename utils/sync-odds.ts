@@ -20,28 +20,28 @@ const SPORTS_CONFIG: Record<LeagueKey, { sportKey: string; name: string }> = {
 
 const heroImages: any = {
   nfl: [
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1762769368/gr8lv0brdyz22lvji2mi.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764926595/view-american-football-ball-with-helmet_khu88k.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005864/zimrypnrhrjonxok7m1l_qotb9f.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005863/h8zitmphyhg6dnynxrbb_g9amkv.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005864/tbjumwwgnkdkd9rdxhhh_utynji.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005863/c7po6p9cn3blm3guvoze_te6fpl.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005863/qkuj9qdacmvc6s5tzbza_odymbb.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/gfzx6kbmovenniivmcmm_qlicy3.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/ehmhx4gtkhqcosym5cya_zacwfz.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/yqzjndtzm2q07wwpfhcd_virbbz.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/gy1ws21ulyk3cjzbpo5j_jzo4em.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927297/project-290-BajUXIzm87U-unsplash_ks3e8q.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927298/ameer-basheer-Yzef5dRpwWg-unsplash_bxqjzu.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927298/dave-adamson--nATH0CrkMU-unsplash_s9w3cd.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927300/deon-a-webster-pXz8Vh3gFpw-unsplash_uznl54.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927986/ryan-reinoso-Gf0oz8mgd1Y-unsplash_sdsefl.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927987/patrick-ogilvie-GB9XKDZWwp0-unsplash_nmkkyw.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927984/joshua-hoehne-rWxxEgUIfIw-unsplash_fnqqow.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927986/gene-gallin-WY4Siei3lHo-unsplash_kqtjwz.webp",
   ],
   nba: [
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006042/yupwwib1de27oesav68o_z3ie1j.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/vt3iqeff2umiql52768q_co3yak.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929243/diane-picchiottino-w_LBxBvafMM-unsplash_zekdlh.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/mnmscz0pfqocfqxuuwwi_ryttsx.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/ulga24zh6dbnehbp8jqm_lgruik.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/pizsgv1cs3fdo1msfjr4_tbo9mt.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929244/side-view-basket-with-ball-it_jovjde.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/pexels-jimmy-liao-3615017-12602140_nxi1ax.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/m13fwawmke2hz2qansbl_uhzyyc.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/athmvh7pt4cpmh6gi8cw_qcvwgm.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/fngbkyakqcj9y0zbig9z_yy7cm8.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006038/e1b869nhhe3kq00vw1ts_ybj9be.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/m13fwawmke2hz2qansbl_uhzyyc.webp", //color
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/athmvh7pt4cpmh6gi8cw_qcvwgm.webp", //color
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/fngbkyakqcj9y0zbig9z_yy7cm8.webp", //not general
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006038/e1b869nhhe3kq00vw1ts_ybj9be.webp", //not general
   ],
   ncaaf: [
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764045705/male-american-football-player-uniform-field_gmq2to.webp",
