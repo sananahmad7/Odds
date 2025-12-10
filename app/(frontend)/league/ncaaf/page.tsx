@@ -35,7 +35,7 @@ export type SerializableOddsEvent = {
 export default async function NCAAFLeaguePage() {
   // Pull ONLY NCAAF events from DB
   const dbEvents = await prisma.oddsEvent.findMany({
-    where: { sportTitle: "NCAAF", commenceTime: { gt: new Date() } },
+    where: { sportTitle: "NCAAF" },
     include: {
       bookmakers: {
         include: {

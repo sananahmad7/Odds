@@ -35,7 +35,7 @@ export type SerializableOddsEvent = {
 export default async function MLBLeaguePage() {
   // Pull ONLY MLB events from DB
   const dbEvents = await prisma.oddsEvent.findMany({
-    where: { sportTitle: "MLB", commenceTime: { gt: new Date() } },
+    where: { sportTitle: "MLB" },
     include: {
       bookmakers: {
         include: {

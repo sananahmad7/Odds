@@ -36,7 +36,7 @@ export default async function NCAABLeaguePage() {
   // Pull ONLY NCAAB events from DB
   const t0 = Date.now();
   const dbEvents = await prisma.oddsEvent.findMany({
-    where: { sportTitle: "NCAAB", commenceTime: { gt: new Date() } },
+    where: { sportTitle: "NCAAB" },
     include: {
       bookmakers: {
         include: {
