@@ -18,7 +18,7 @@ type LeagueFilter = "ALL" | string;
 
 // ✅ Base leagues that should always appear in the filter,
 // even if there are currently no events for them.
-const BASE_LEAGUES = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "UFC"];
+const BASE_LEAGUES = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "MMA"];
 
 export default function AdminOddsEventsPage() {
   const [events, setEvents] = useState<ApiOddsEvent[]>([]);
@@ -289,6 +289,7 @@ export default function AdminOddsEventsPage() {
                       className="hidden"
                       onChange={(e) => handleImageChange(e, ev)}
                     />
+
                     <label
                       htmlFor={inputId}
                       className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-poppins cursor-pointer transition-colors ${

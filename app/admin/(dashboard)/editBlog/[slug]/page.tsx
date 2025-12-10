@@ -231,7 +231,7 @@ export default function EditBlogPage() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 bg-white">
+    <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 bg-white mb-5">
       <Toaster position="top-right" />
       <h1 className="font-playfair text-4xl md:text-5xl mt-10 text-[#263E4D]">
         Edit Blog
