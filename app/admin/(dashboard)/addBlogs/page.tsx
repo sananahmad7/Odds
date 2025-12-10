@@ -415,7 +415,7 @@ export default function AdminAddBlogPage() {
                 />
               </svg>
             )}
-            {submitting ? "Submitting..." : "Submit (Demo)"}
+            {submitting ? "Submitting..." : "Submit"}
           </button>
         </div>
       </form>
