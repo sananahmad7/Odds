@@ -54,6 +54,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
       under?: { point: string; price: string };
     };
   };
+
   const getBestOdds = (event: DetailEvent): NormalizedOdds | null => {
     if (!event.bookmakers || event.bookmakers.length === 0) return null;
     const requiredMarkets = ["spreads", "h2h", "totals"];
@@ -135,6 +136,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
       },
     };
   };
+
   // Normalize odds
   const odds = useMemo(() => getBestOdds(event), [event]);
 
@@ -207,6 +209,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
               matchup.
             </p>
           </header>
+
           {/* 🔥 Hero image from OddsEvent.image (Cloudinary) */}
           {event.image && event.image.trim().length > 0 && (
             <div className="mb-8">
@@ -221,6 +224,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
               </div>
             </div>
           )}
+
           {/* Odds Card */}
           {odds ? (
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">
@@ -391,28 +395,28 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
               </p>
             </div>
           )}
-          {/* Predictions Section */}
 
+          {/* Predictions Section */}
           <section className="mb-8">
             {event.eventpredictions.map((prediction, idx) => (
               <div key={idx} className="mb-8">
                 {/* Display Home Team Logo before the article heading */}
-                <div className="flex items-center  mb-4">
+                <div className="flex items-center mb-4">
                   {/* Home team logo */}
-                  <div className="  h-full   mr-2">
-                    {event.sportTitle !== "MMA" && (
+                  {event.sportTitle !== "MMA" && homeLogoVisible && (
+                    <div className="mr-2">
                       <Image
                         src={`/${event.sportTitle}/${event.homeTeam}.png`}
                         alt={`${event.homeTeam} logo`}
                         width={32}
                         height={32}
                         className="object-contain"
-                        onError={() => setHomeLogoVisible(false)} // Ensures no error if logo fails to load
+                        onError={() => setHomeLogoVisible(false)}
                       />
-                    )}
-                  </div>
+                    </div>
+                  )}
                   {/* Article heading */}
-                  <h2 className="font-gtsuper  text-2xl sm:text-3xl font-bold text-[#111827]  pb-2 ">
+                  <h2 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] pb-2">
                     {prediction.article1Heading}
                   </h2>
                 </div>
@@ -422,30 +426,33 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
                     {prediction.article1Description}
                   </p>
                 </div>
-                <div className="flex items-center">
-                  <div className="   mr-2">
-                    {event.sportTitle !== "MMA" && (
+
+                {/* Away side heading */}
+                <div className="flex items-center mt-4">
+                  {event.sportTitle !== "MMA" && awayLogoVisible && (
+                    <div className="mr-2">
                       <Image
                         src={`/${event.sportTitle}/${event.awayTeam}.png`}
                         alt={`${event.homeTeam} logo`}
                         width={32}
                         height={32}
                         className="object-contain"
-                        onError={() => setAwayLogoVisible(false)} // Ensures no error if logo fails to load
+                        onError={() => setAwayLogoVisible(false)}
                       />
-                    )}
-                  </div>
-                  <h2 className="font-gtsuper text-2xl mt-4 sm:text-3xl font-gtsuper font-bold text-[#111827]  pb-2">
+                    </div>
+                  )}
+                  <h2 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] pb-2">
                     {prediction.article2Heading}
                   </h2>
                 </div>
+
                 <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
                   <p className="whitespace-pre-line">
                     {prediction.article2Description}
                   </p>
                 </div>
 
-                <h2 className="font-gtsuper text-2xl mt-4 sm:text-3xl font-gtsuper font-bold text-[#111827] mb-4 pb-2">
+                <h2 className="font-gtsuper text-2xl mt-4 sm:text-3xl font-bold text-[#111827] mb-4 pb-2">
                   {prediction.article3Heading}
                 </h2>
                 <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">

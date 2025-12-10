@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-  "dev": "concurrently -k -n WEB,CRON -c auto \"next dev\" \"npm:cron:dev\"",
-  "build": "next build --webpack",
-  "start": "concurrently -k -n WEB,CRON -c auto \"next start\" \"npm:cron:start\"",
-  "cron:start": "NODE_ENV=production tsx -r dotenv/config scripts/sync-odds-cron.ts",
-  "cron:dev": "tsx -r dotenv/config scripts/sync-odds-cron.ts",
-  "postinstall": "prisma generate",
-  "lint": "eslint",
-  "seed:api": "tsx ./seed.ts"
-},
+    "dev": "concurrently -k -n WEB,CRON -c auto \"next dev --webpack\" \"npm:cron:dev\"",
+    "build": "next build --webpack",
+    "start": "concurrently -k -n WEB,CRON -c auto \"next start --webpack\" \"npm:cron:start\"",
+    "cron:start": "NODE_ENV=production tsx -r dotenv/config scripts/sync-odds-cron.ts",
+    "cron:dev": "tsx -r dotenv/config scripts/sync-odds-cron.ts",
+    "postinstall": "prisma generate",
+    "lint": "eslint",
+    "seed:api": "tsx ./seed.ts"
+  },
   "dependencies": {
     "@mantine/core": "^8.3.6",
     "@prisma/client": "^6.18.0",
