@@ -1,0 +1,15 @@
+-- AlterTable
+ALTER TABLE "Eventprediction" ADD COLUMN     "gameOverviewDescription" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "gameOverviewHeading" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "matchupBreakdownDescription" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "matchupBreakdownHeading" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "overUnderPickDescription" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "overUnderPickHeading" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "playerPropPickDescription" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "playerPropPickHeading" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "spreadPickDescription" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "spreadPickHeading" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "teamASeasonDescription" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "teamASeasonHeading" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "teamBSeasonDescription" TEXT NOT NULL DEFAULT '',
+ADD COLUMN     "teamBSeasonHeading" TEXT NOT NULL DEFAULT '';

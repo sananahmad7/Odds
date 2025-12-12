@@ -1,64 +1,83 @@
-// components/Home/FetchUpcomingGames.tsx
 import UpcomingGames from "./UpcomingGames";
 import { prisma } from "@/lib/prisma";
 
-const LEAGUES = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB", "MMA"] as const;
+// League labels in our DB
+const WEEKLY_LEAGUES = ["NFL", "NCAAF", "MMA"] as const; // entire upcoming week
+const DAILY_LEAGUES = ["NBA", "NCAAB", "MLB"] as const; // games for today only
+const LEAGUES = [...WEEKLY_LEAGUES, ...DAILY_LEAGUES] as const;
 
 export default async function FetchUpcomingGamesSection() {
   const now = new Date();
-  const t1 = Date.now();
 
-  // Fetch events per league directly without flattening
-  const perLeague = await Promise.all(
-    LEAGUES.map((league) =>
-      prisma.oddsEvent.findMany({
-        where: {
-          sportTitle: league,
-          commenceTime: { gte: now },
+  // Compute date windows in UTC to keep things consistent on the server
+  const startOfToday = new Date(now);
+  //startOfToday.setUTCHours(0, 0, 0, 0);
+
+  const dayEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+  const endOfWeek = new Date(now);
+  endOfWeek.setUTCDate(endOfWeek.getUTCDate() + 7); // next 7 days for weekly leagues
+
+  // Single optimized query:
+  // - Weekly leagues: all games in next 7 days
+  // - Daily leagues: all games happening today
+  const dbEvents = await prisma.oddsEvent.findMany({
+    where: {
+      OR: [
+        {
+          sportTitle: { in: WEEKLY_LEAGUES as unknown as string[] },
+          commenceTime: {
+            gte: now,
+            lt: endOfWeek,
+          },
         },
-        orderBy: { commenceTime: "asc" },
-        take: 6, // Limit to 6 events per league
+        {
+          sportTitle: { in: DAILY_LEAGUES as unknown as string[] },
+          commenceTime: {
+            gte: startOfToday,
+            lt: dayEnd,
+          },
+        },
+      ],
+    },
+    orderBy: { commenceTime: "asc" },
+    select: {
+      id: true,
+      sportKey: true,
+      sportTitle: true,
+      commenceTime: true, // Date
+      homeTeam: true,
+      awayTeam: true,
+      bookmakers: {
+        take: 3, // keep this small for performance – enough options to pick a "best" book
         select: {
           id: true,
-          sportKey: true,
-          sportTitle: true,
-          commenceTime: true, // Keep as Date
-          homeTeam: true,
-          awayTeam: true,
-          bookmakers: {
-            take: 3,
+          key: true,
+          title: true,
+          lastUpdate: true, // Date
+          markets: {
+            where: {
+              key: { in: ["h2h", "spreads", "totals"] }, // only markets we actually use
+            },
             select: {
               id: true,
               key: true,
-              title: true,
-              lastUpdate: true, // Keep as Date
-              markets: {
-                where: {
-                  key: { in: ["h2h", "spreads", "totals"] }, // Only needed markets
-                },
+              lastUpdate: true, // Date
+              outcomes: {
                 select: {
                   id: true,
-                  key: true,
-                  lastUpdate: true, // Keep as Date
-                  outcomes: {
-                    select: {
-                      id: true,
-                      name: true,
-                      price: true,
-                      point: true,
-                    },
-                  },
+                  name: true,
+                  price: true,
+                  point: true,
                 },
               },
             },
           },
         },
-      })
-    )
-  );
+      },
+    },
+  });
 
-  // Flatten perLeague array properly and ensure it's a DbOddsEvent[]
-  const dbEvents = perLeague.flat();
-  // Pass dbEvents directly to UpcomingGames without flattening or re-shaping
+  // Pass all events through to the client component
   return <UpcomingGames events={dbEvents} />;
 }

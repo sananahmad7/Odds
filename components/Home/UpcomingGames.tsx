@@ -1,4 +1,3 @@
-// components/Home/UpcomingGames.tsx
 "use client";
 
 import Link from "next/link";
@@ -49,7 +48,7 @@ type UpcomingGame = {
   awayTeam: { name: string };
   kickoffIso?: string;
   kickoffTs?: number;
-  bookmakerName?: string; // 👈 Pass through to GameCard
+  bookmakerName?: string;
   odds?: {
     spread?: {
       home?: { point?: number | null; price?: number | null };
@@ -106,7 +105,7 @@ function mapDbEventToUiGame(e: DbOddsEvent): UpcomingGame {
 
   // 1. Pick Bookmaker
   const book = pickBestBookmaker(e.bookmakers);
-  const bookmakerName = book?.title; // 👈 string | undefined (no null)
+  const bookmakerName = book?.title;
 
   // 2. Extract Markets
   const h2h = getMarket(book, "h2h");
@@ -126,7 +125,7 @@ function mapDbEventToUiGame(e: DbOddsEvent): UpcomingGame {
   return {
     id: e.id,
     league: e.sportTitle,
-    bookmakerName, // 👈 now part of the game object
+    bookmakerName,
     homeTeam: { name: e.homeTeam },
     awayTeam: { name: e.awayTeam },
     kickoffIso,
@@ -227,7 +226,7 @@ type Props = {
 };
 
 export default function UpcomingGames({ events }: Props) {
-  // --- UI State (Restored) ---
+  // --- UI State ---
   const [selectedLeague, setSelectedLeague] = useState<string>("NFL");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -278,23 +277,24 @@ export default function UpcomingGames({ events }: Props) {
           return hay.includes(q);
         });
 
-    return searched.slice(0, 6); // Limit to 6
+    // ⬇️ CHANGED: no more slice(0, 6) – show all games for that league
+    return searched;
   }, [uiGames, selectedLeague, query]);
 
   const active = leagues.find((l) => l.label === selectedLeague) || leagues[0];
   const ActiveLogo = active.logo;
 
   return (
-    <section id="upcoming" className="w-full bg-white py-16 sm:py-20">
+    <section id="upcoming" className="w-full bg-white py-12 lg:py-16">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         {/* --- Header Section --- */}
         <div className="mb-8 sm:mb-12 grid gap-4 sm:gap-6 md:grid-cols-[1fr_auto_auto] md:items-end">
           <div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-800 tracking-tight font-gtsuper">
-              Upcoming Games
+              The Slate
             </h2>
             <p className="mt-2 text-base sm:text-lg text-slate-600 font-neue ">
-              Lines, Prices and total for every game this week.
+              Every Matchup. Every Pick. Zero Fluff
             </p>
           </div>
 
@@ -395,7 +395,11 @@ export default function UpcomingGames({ events }: Props) {
           ) : (
             <div className="col-span-full py-12 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
               <p className="text-gray-500 font-neue">
-                No upcoming games found for {selectedLeague}.
+                {selectedLeague === "NCAAB" ||
+                selectedLeague === "NBA" ||
+                selectedLeague === "MLB"
+                  ? `No ${selectedLeague} Games Found for today. Click View All to see games in the Upcoming Days`
+                  : `No ${selectedLeague} Games Found`}
               </p>
             </div>
           )}

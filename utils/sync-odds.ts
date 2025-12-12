@@ -1,8 +1,9 @@
 // lib/sync-odds.ts
 import axios, { AxiosError } from "axios";
-import { prisma } from "../lib/prisma";
+import { prisma } from "@/lib/prisma";
 import OpenAI from "openai";
 import { encode } from "@toon-format/toon";
+import { NextResponse } from "next/server";
 
 type LeagueKey = "nfl" | "nba" | "ncaaf" | "ncaab" | "mlb" | "mma";
 
@@ -12,36 +13,33 @@ const SPORTS_CONFIG: Record<LeagueKey, { sportKey: string; name: string }> = {
   ncaaf: { sportKey: "americanfootball_ncaaf", name: "NCAAF" },
   ncaab: { sportKey: "basketball_ncaab", name: "NCAAB" },
   mlb: { sportKey: "baseball_mlb", name: "MLB" },
-
-  // ✅ FIX: use the actual Odds API sport key for MMA / UFC
-  // Docs list: mma_mixed_martial_arts :contentReference[oaicite:1]{index=1}
   mma: { sportKey: "mma_mixed_martial_arts", name: "MMA" },
 };
 
 const heroImages: any = {
   nfl: [
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764926595/view-american-football-ball-with-helmet_khu88k.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1762769368/gr8lv0brdyz22lvji2mi.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005864/zimrypnrhrjonxok7m1l_qotb9f.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927297/project-290-BajUXIzm87U-unsplash_ks3e8q.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927298/ameer-basheer-Yzef5dRpwWg-unsplash_bxqjzu.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927298/dave-adamson--nATH0CrkMU-unsplash_s9w3cd.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927300/deon-a-webster-pXz8Vh3gFpw-unsplash_uznl54.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927986/ryan-reinoso-Gf0oz8mgd1Y-unsplash_sdsefl.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927987/patrick-ogilvie-GB9XKDZWwp0-unsplash_nmkkyw.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927984/joshua-hoehne-rWxxEgUIfIw-unsplash_fnqqow.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764927986/gene-gallin-WY4Siei3lHo-unsplash_kqtjwz.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005863/h8zitmphyhg6dnynxrbb_g9amkv.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005864/tbjumwwgnkdkd9rdxhhh_utynji.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005863/c7po6p9cn3blm3guvoze_te6fpl.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005863/qkuj9qdacmvc6s5tzbza_odymbb.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/gfzx6kbmovenniivmcmm_qlicy3.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/ehmhx4gtkhqcosym5cya_zacwfz.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/yqzjndtzm2q07wwpfhcd_virbbz.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764005862/gy1ws21ulyk3cjzbpo5j_jzo4em.webp",
   ],
   nba: [
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006042/yupwwib1de27oesav68o_z3ie1j.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929243/diane-picchiottino-w_LBxBvafMM-unsplash_zekdlh.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/vt3iqeff2umiql52768q_co3yak.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/mnmscz0pfqocfqxuuwwi_ryttsx.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/ulga24zh6dbnehbp8jqm_lgruik.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929244/side-view-basket-with-ball-it_jovjde.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006041/pizsgv1cs3fdo1msfjr4_tbo9mt.webp",
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/pexels-jimmy-liao-3615017-12602140_nxi1ax.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/m13fwawmke2hz2qansbl_uhzyyc.webp", //color
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929991/360_F_899774739_tgiiMlPrvv648yRJ3oqMDnQKuyBz6cDs_o7n8ao.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929993/taylor-smith-nYg4BDP86Aw-unsplash_lodt1n.webp",
-    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764929992/wesley-tingey-V3fpPg7aBYI-unsplash_uxxhoo.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006040/m13fwawmke2hz2qansbl_uhzyyc.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/athmvh7pt4cpmh6gi8cw_qcvwgm.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006039/fngbkyakqcj9y0zbig9z_yy7cm8.webp",
+    "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764006038/e1b869nhhe3kq00vw1ts_ybj9be.webp",
   ],
   ncaaf: [
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764045705/male-american-football-player-uniform-field_gmq2to.webp",
@@ -92,6 +90,7 @@ const heroImages: any = {
     "https://res.cloudinary.com/dmlemjrcg/image/upload/v1764046942/csse08tm1ykclqh0oduc_vamwki.webp",
   ],
 };
+
 const API_KEY = process.env.ODDS_API_KEY;
 const BASE_URL = "https://api.the-odds-api.com/v4/sports";
 
@@ -144,7 +143,6 @@ function requireEnv(
 
 // ISO-8601 without milliseconds, as in Odds API docs examples
 function toIsoNoMs(date: Date): string {
-  // 2025-11-17T10:21:15.123Z -> 2025-11-17T10:21:15Z
   const iso = date.toISOString();
   const [noMs] = iso.split(".");
   return `${noMs}Z`;
@@ -160,8 +158,8 @@ async function fetchLeagueOdds(league: LeagueKey): Promise<ApiEvent[]> {
 
   const params = new URLSearchParams({
     apiKey: API_KEY,
-    regions: "us", // valid region per docs :contentReference[oaicite:2]{index=2}
-    markets: "h2h,spreads,totals", // featured markets only :contentReference[oaicite:3]{index=3}
+    regions: "us",
+    markets: "h2h,spreads,totals",
     oddsFormat: "american",
     commenceTimeFrom: toIsoNoMs(now),
     commenceTimeTo: toIsoNoMs(sevenDaysFromNow),
@@ -201,10 +199,14 @@ async function inBatches<T>(
   }
 }
 
+// NOTE: this client is unused here but left as–is to avoid changing other code paths.
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// -----------------------------
+// Prediction generation
+// -----------------------------
 async function generateAndStorePredictionForEvent(
   oddsEventId: string
 ): Promise<void> {
@@ -242,7 +244,7 @@ async function generateAndStorePredictionForEvent(
   // Prepare the odds data for the prediction
   const oddsData = encode(event);
 
-  // Request OpenAI for prediction content
+  // Request OpenAI for prediction content (enhanced prompt + 400-word sections)
   let completion;
   try {
     completion = await openaiClient.chat.completions.create({
@@ -251,39 +253,55 @@ async function generateAndStorePredictionForEvent(
         {
           role: "system",
           content: `
-You are a professional sports betting analyst. Given odds and match data, you write clear, well-structured prediction articles about which team is more likely to win. Base your reasoning only on the provided data. Do not mention being an AI or refer to the prompt itself.
-          `.trim(),
+You are a seasoned, sharp, slightly degenerate sports bettor — a mix of film junkie, data nerd, and Vegas insider. You talk in confident sportsbook language. You never mention being an AI. Base reasoning ONLY on the provided odds data.
+`.trim(),
         },
         {
           role: "user",
           content: `
-Using the following data, write a detailed prediction article about which team is more likely to win.
+Write a prediction article using this structure:
 
-Requirements:
-- Start with a short, catchy introduction.
-- Write 3 distinct sections:
-  1. **How Team 1 Can Win**: Analyze the key factors (recent form, head-to-head, odds, strengths/weaknesses, home/away, injuries) and explain why Team 1 is likely to win.
-  2. **How Team 2 Can Win**: Analyze the key factors and explain why Team 2 is likely to win.
-  3. **Overall Summary and Final Prediction**: Provide an overall summary with your final prediction.
+1. Game Overview — 1–2 sentences.
+2. Team A Season Snapshot — record, ATS/O-U, identity, trends.
+3. Team B Season Snapshot — same but contrasting.
+4. Matchup Breakdown — who has the edge and why.
+5. Predictions:
+   - Spread Pick
+   - Over/Under Pick
+   - Player Prop Pick
 
-OUTPUT FORMAT (VERY IMPORTANT – FOLLOW EXACTLY):
+IMPORTANT LENGTH RULE:
+Every content section (every field ending with "-content") MUST be AT LEAST 400 words.
+No summaries. No short answers. Provide deep, detailed, analytical breakdowns.
 
-article-title: <a short, catchy title for the prediction article>
-article-1-heading: <how Team 1 can win, catchy heading>
-article-1-content: <detailed content about how Team 1 can win>
-article-2-heading: <how Team 2 can win, catchy heading>
-article-2-content: <detailed content about how Team 2 can win>
-article-3-heading: <overall summary and final prediction heading>
-article-3-content: <overall summary and final prediction>
+OUTPUT FORMAT (NO MARKDOWN, FOLLOW EXACTLY):
 
-FORMAT RULES:
-- Do NOT use any markdown formatting at all (no #, ##, ###, *, -, _, or ---).
-- Do NOT add any other fields or labels besides the ones specified.
-- Do NOT put blank titles or dummy text; all fields must be meaningful.
+article-title: <title>
 
-Here is the data to use:
+game-overview-heading: <heading>
+game-overview-content: <content>
+
+team-a-season-heading: <heading>
+team-a-season-content: <content>
+
+team-b-season-heading: <heading>
+team-b-season-content: <content>
+
+matchup-breakdown-heading: <heading>
+matchup-breakdown-content: <content>
+
+spread-pick-heading: <heading>
+spread-pick-content: <content>
+
+over-under-pick-heading: <heading>
+over-under-pick-content: <content>
+
+player-prop-pick-heading: <heading>
+player-prop-pick-content: <content>
+
+DATA:
 ${oddsData}
-          `.trim(),
+`.trim(),
         },
       ],
     });
@@ -305,88 +323,107 @@ ${oddsData}
     throw new Error("Unexpected OpenAI response format.");
   }
 
-  // Parse content into structured sections
-  const titleLabel = "article-title:";
-  const section1HeadingLabel = "article-1-heading:";
-  const section1ContentLabel = "article-1-content:";
-  const section2HeadingLabel = "article-2-heading:";
-  const section2ContentLabel = "article-2-content:";
-  const section3HeadingLabel = "article-3-heading:";
-  const section3ContentLabel = "article-3-content:";
+  // Helper to extract content between labels
+  const extract = (label: string, nextLabel?: string) => {
+    const start = content.indexOf(label);
+    if (start === -1) return "";
+    const begin = start + label.length;
 
-  const titleIndex = content.indexOf(titleLabel);
-  const section1HeadingIndex = content.indexOf(section1HeadingLabel);
-  const section1ContentIndex = content.indexOf(section1ContentLabel);
-  const section2HeadingIndex = content.indexOf(section2HeadingLabel);
-  const section2ContentIndex = content.indexOf(section2ContentLabel);
-  const section3HeadingIndex = content.indexOf(section3HeadingLabel);
-  const section3ContentIndex = content.indexOf(section3ContentLabel);
+    if (!nextLabel) {
+      return content.slice(begin).trim();
+    }
 
-  let articleTitle = "";
-  let article1Heading = "";
-  let article1Content = "";
-  let article2Heading = "";
-  let article2Content = "";
-  let article3Heading = "";
-  let article3Content = "";
+    const end = content.indexOf(nextLabel);
+    if (end === -1) {
+      return content.slice(begin).trim();
+    }
 
-  if (titleIndex !== -1) {
-    articleTitle = content
-      .slice(titleIndex + titleLabel.length, section1HeadingIndex)
-      .trim();
-  }
-  if (section1HeadingIndex !== -1 && section1ContentIndex !== -1) {
-    article1Heading = content
-      .slice(
-        section1HeadingIndex + section1HeadingLabel.length,
-        section1ContentIndex
-      )
-      .trim();
-    article1Content = content
-      .slice(
-        section1ContentIndex + section1ContentLabel.length,
-        section2HeadingIndex
-      )
-      .trim();
-  }
-  if (section2HeadingIndex !== -1 && section2ContentIndex !== -1) {
-    article2Heading = content
-      .slice(
-        section2HeadingIndex + section2HeadingLabel.length,
-        section2ContentIndex
-      )
-      .trim();
-    article2Content = content
-      .slice(
-        section2ContentIndex + section2ContentLabel.length,
-        section3HeadingIndex
-      )
-      .trim();
-  }
-  if (section3HeadingIndex !== -1 && section3ContentIndex !== -1) {
-    article3Heading = content
-      .slice(
-        section3HeadingIndex + section3HeadingLabel.length,
-        section3ContentIndex
-      )
-      .trim();
-    article3Content = content
-      .slice(section3ContentIndex + section3ContentLabel.length)
-      .trim();
-  }
+    return content.slice(begin, end).trim();
+  };
 
-  // Store prediction in the database
+  // Parse all sections
+  const articleTitle = extract("article-title:", "game-overview-heading:");
+
+  const gameOverviewHeading = extract(
+    "game-overview-heading:",
+    "game-overview-content:"
+  );
+  const gameOverviewDescription = extract(
+    "game-overview-content:",
+    "team-a-season-heading:"
+  );
+
+  const teamASeasonHeading = extract(
+    "team-a-season-heading:",
+    "team-a-season-content:"
+  );
+  const teamASeasonDescription = extract(
+    "team-a-season-content:",
+    "team-b-season-heading:"
+  );
+
+  const teamBSeasonHeading = extract(
+    "team-b-season-heading:",
+    "team-b-season-content:"
+  );
+  const teamBSeasonDescription = extract(
+    "team-b-season-content:",
+    "matchup-breakdown-heading:"
+  );
+
+  const matchupBreakdownHeading = extract(
+    "matchup-breakdown-heading:",
+    "matchup-breakdown-content:"
+  );
+  const matchupBreakdownDescription = extract(
+    "matchup-breakdown-content:",
+    "spread-pick-heading:"
+  );
+
+  const spreadPickHeading = extract(
+    "spread-pick-heading:",
+    "spread-pick-content:"
+  );
+  const spreadPickDescription = extract(
+    "spread-pick-content:",
+    "over-under-pick-heading:"
+  );
+
+  const overUnderPickHeading = extract(
+    "over-under-pick-heading:",
+    "over-under-pick-content:"
+  );
+  const overUnderPickDescription = extract(
+    "over-under-pick-content:",
+    "player-prop-pick-heading:"
+  );
+
+  const playerPropPickHeading = extract(
+    "player-prop-pick-heading:",
+    "player-prop-pick-content:"
+  );
+  const playerPropPickDescription = extract("player-prop-pick-content:");
+
+  // Store prediction in the database using the new schema
   try {
     await prisma.eventprediction.create({
       data: {
-        articleTitle: articleTitle,
-        article1Heading: article1Heading,
-        article1Description: article1Content,
-        article2Heading: article2Heading,
-        article2Description: article2Content,
-        article3Heading: article3Heading,
-        article3Description: article3Content,
-        oddsEventId: oddsEventId,
+        articleTitle,
+        gameOverviewHeading,
+        gameOverviewDescription,
+        teamASeasonHeading,
+        teamASeasonDescription,
+        teamBSeasonHeading,
+        teamBSeasonDescription,
+        matchupBreakdownHeading,
+        matchupBreakdownDescription,
+        spreadPickHeading,
+        spreadPickDescription,
+        overUnderPickHeading,
+        overUnderPickDescription,
+        playerPropPickHeading,
+        playerPropPickDescription,
+        oddsEventId,
       },
     });
   } catch (error) {
@@ -515,10 +552,10 @@ async function prunePastEvents() {
     },
   });
 
-  await prisma.oddsEvent.deleteMany({
+  await prisma.oddsEvent.findMany({
     where: {
       commenceTime: {
-        lt: new Date(), // anything before "now"
+        lt: new Date(),
       },
     },
   });
@@ -526,7 +563,7 @@ async function prunePastEvents() {
 
 // Main sync function
 export async function handleSyncOdds(options?: { prune?: boolean }) {
-  const { prune = false } = options ?? {};
+  const { prune = true } = options ?? {};
 
   try {
     requireEnv("ODDS_API_KEY", API_KEY);
@@ -549,7 +586,13 @@ export async function handleSyncOdds(options?: { prune?: boolean }) {
       events: allData[lg]?.length ?? 0,
     }));
 
-    return { success: true, summary };
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Odds processed successfully",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     const axiosErr = error as AxiosError | Error;
 

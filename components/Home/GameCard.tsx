@@ -13,8 +13,8 @@ type GameCardGame = {
   awayTeam: { name: string };
   bookmakerName?: string;
   venue?: string | null;
-  kickoffIso?: string; // parent sets this = commenceTime
-  commenceTime?: string; // optional if parent passes raw DB event
+  kickoffIso?: string;
+  commenceTime?: string;
   kickoffTs?: number;
   odds?: {
     spread?: {
@@ -23,40 +23,31 @@ type GameCardGame = {
     };
     total?: {
       point?: number | null;
-      over?: number | null;
-      under?: number | null;
+      // over/under odds no longer needed for display
     };
     moneyline?: { home?: number | null; away?: number | null };
   };
 };
 
 function getTeamName(team: string, league: string): string {
-  // List of leagues to apply the city-removal rule
   const leaguesWithCityNames = ["NFL", "NBA", "NCAAF", "NCAAB", "MLB"];
-
-  // If the league requires city name removal (NFL, NBA, NCAAF, NCAAB, MLB)
   if (leaguesWithCityNames.includes(league)) {
-    const parts = team.split(" "); // Split the team name by space
-
-    // Check if the team has multiple parts (more than 1 word)
+    const parts = team.split(" ");
     if (parts.length > 1) {
-      // Remove the first part (which is usually the city) and return the rest
       return parts.slice(1).join(" ");
     }
   }
-
-  // Return the full team name for other leagues (e.g., MMA)
   return team;
 }
 
-/** ---------- Helpers (kept local so the card is fully reusable) ---------- */
+/** ---------- Helpers ---------- */
 function getKickoffTimestampFromGame(game: GameCardGame): number {
   const maybeKickoffTs = (game as any)?.kickoffTs;
   if (typeof maybeKickoffTs === "number") return maybeKickoffTs;
 
   const iso =
     (game as any)?.kickoffIso ??
-    (game as any)?.commenceTime ?? // allow raw DB field too
+    (game as any)?.commenceTime ??
     (game as any)?.commence_time;
   if (typeof iso === "string") {
     const p = Date.parse(iso);
@@ -74,10 +65,14 @@ function getKickoffTimestampFromGame(game: GameCardGame): number {
   return Number.isFinite(parsed) ? parsed : NaN;
 }
 
+// Helper to ensure signs are aligned. Points always have a sign.
 function signPoint(n?: number | null) {
   if (typeof n !== "number" || Number.isNaN(n)) return "-";
-  return n > 0 ? `+${n}` : `${n}`;
+  // Using en-dash for negative to match standard typographic practices for odds
+  return n > 0 ? `+${n}` : `${n}`.replace("-", "\u2212");
 }
+
+// Helper for American odds prices
 function fmtAmerican(n?: number | null) {
   if (typeof n !== "number" || Number.isNaN(n)) return "";
   return n > 0 ? `+${n}` : `\u2212${Math.abs(n)}`;
@@ -101,18 +96,6 @@ function extractSpreadPieces(game: GameCardGame) {
   };
 }
 
-function extractTotalPieces(game: GameCardGame) {
-  const t: any = (game as any)?.odds?.total;
-  if (t && typeof t === "object") {
-    return {
-      pointText: typeof t.point === "number" ? `${t.point}` : "-",
-      overText: fmtAmerican(t.over) || "—",
-      underText: fmtAmerican(t.under) || "—",
-    };
-  }
-  return { pointText: "-", overText: "—", underText: "—" };
-}
-
 function extractMoneylinePieces(game: GameCardGame) {
   const ml: any = (game as any)?.odds?.moneyline;
   if (ml && typeof ml === "object") {
@@ -124,13 +107,19 @@ function extractMoneylinePieces(game: GameCardGame) {
   return { awayMl: "—", homeMl: "—" };
 }
 
-/** Grid for TEAM rows: Team | Spread | ML */
-const ODDS_GRID_TEAMS =
-  "grid  grid-cols-[1fr_minmax(92px,auto)_minmax(64px,auto)] items-center gap-3";
+/**
+ * Grid definition for alignment.
+ * Using fixed pixel widths for numerical columns ensures perfect alignment across different cards.
+ * 1fr: Team Name (takes remaining space)
+ * 85px: Spread column
+ * 75px: ML column
+ * 60px: Total column
+ */
+const ODDS_GRID = "grid grid-cols-[1fr_85px_75px_60px] items-center gap-2";
 
 type GameCardProps = {
   game: GameCardGame;
-  predictionHref?: string; // optional override; defaults to /league/[id]
+  predictionHref?: string;
   className?: string;
 };
 
@@ -144,7 +133,6 @@ export default function GameCard({
 
   const kickoffTs = getKickoffTimestampFromGame(game);
 
-  // ✅ Convert to US Central Time (America/Chicago)
   const kickoffLabel = Number.isFinite(kickoffTs)
     ? new Date(kickoffTs).toLocaleString("en-US", {
         weekday: "short",
@@ -158,15 +146,22 @@ export default function GameCard({
 
   const { awayPointText, awayPriceText, homePointText, homePriceText } =
     extractSpreadPieces(game);
-  const { pointText, overText, underText } = extractTotalPieces(game);
   const { awayMl, homeMl } = extractMoneylinePieces(game);
 
-  // If parent didn't pass a href, default to the dynamic league route
+  // Get Total Point
+  const totalPoint = game.odds?.total?.point;
+  const totalPointText =
+    typeof totalPoint === "number" && !Number.isNaN(totalPoint)
+      ? `${totalPoint}`
+      : "-";
+
   const href = predictionHref ?? `/prediction/${game.id}`;
-  //console.log(game.league);
+
+  // The entire card is now a Link
   return (
-    <div
-      className={`group bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#24257C] ${className}`}
+    <Link
+      href={href}
+      className={`group block bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:scale-[1.02] transition-all  ${className}`}
     >
       {/* Top Accent */}
       <div className="h-[3px] w-full bg-[#24257C]" />
@@ -182,10 +177,11 @@ export default function GameCard({
 
         {/* Teams row */}
         <div className="flex items-center justify-between gap-4 mb-5">
-          {/* Away */}
+          {/* Away Team */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {awayLogoVisible && (
-              <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
+              // Removed bg-gray-100 for transparency
+              <div className="w-11 h-11 rounded-md flex items-center justify-center text-xl shrink-0">
                 <Image
                   src={
                     game.league === "MMA"
@@ -201,7 +197,7 @@ export default function GameCard({
               </div>
             )}
             <div className="min-w-0 font-gtsuper">
-              <p className="font-semibold  text-[15px] text-[#111827] truncate">
+              <p className="font-semibold text-[15px] text-[#111827] truncate">
                 {getTeamName(game.awayTeam.name, game.league)}
               </p>
               <p className="text-xs text-gray-500 truncate font-neue">Away</p>
@@ -215,16 +211,17 @@ export default function GameCard({
             </span>
           </div>
 
-          {/* Home */}
+          {/* Home Team */}
           <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
             <div className="min-w-0 font-gtsuper text-right">
-              <p className="font-semibold  text-[15px] text-[#111827] truncate">
+              <p className="font-semibold text-[15px] text-[#111827] truncate">
                 {getTeamName(game.homeTeam.name, game.league)}
               </p>
               <p className="text-xs text-gray-500 truncate font-neue">Home</p>
             </div>
             {homeLogoVisible && (
-              <div className="w-11 h-11 rounded-md bg-gray-100 flex items-center justify-center text-xl shrink-0">
+              // Removed bg-gray-100 for transparency
+              <div className="w-11 h-11 rounded-md flex items-center justify-center text-xl shrink-0">
                 <Image
                   src={
                     game.league === "MMA"
@@ -235,7 +232,7 @@ export default function GameCard({
                   width={44}
                   height={44}
                   className="w-15 h-15 object-contain"
-                  onError={() => setHomeLogoVisible(false)} // Hide on error
+                  onError={() => setHomeLogoVisible(false)}
                 />
               </div>
             )}
@@ -244,86 +241,80 @@ export default function GameCard({
 
         {/* Odds block */}
         <div className="rounded-xl bg-gray-50 border border-gray-100 p-3">
-          {/* Header for team odds */}
+          {/* Header */}
           <div
-            className={`${ODDS_GRID_TEAMS} text-[11px] font-neue uppercase tracking-wide text-gray-500 font-inter`}
+            className={`${ODDS_GRID} text-[11px] font-neue uppercase tracking-wide text-gray-500 font-inter mb-2`}
           >
             <span className="text-left">Team</span>
-            <span className="text-left">Spread</span>
-            <span className="text-left">ML</span>
+            {/* Right align numerical headers to match data */}
+            <span className="text-right">Spread</span>
+            <span className="text-right">ML</span>
+            <span className="text-right">Total</span>
           </div>
 
-          {/* Team rows */}
-          <div className="mt-2 space-y-2">
+          {/* Team rows container - applying tabular-nums here ensures alignment across rows */}
+          <div className="space-y-2 font-neue text-sm [font-variant-numeric:tabular-nums]">
             {/* Away row */}
-            <div className={ODDS_GRID_TEAMS}>
-              <span className="text-sm text-[#111827] font-medium truncate">
+            <div className={ODDS_GRID}>
+              <span className="text-[#111827] font-medium truncate text-left">
                 {game.awayTeam.name}
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
+              <span className="font-semibold text-[#111827] text-right">
                 {awayPointText}{" "}
-                <span className="text-xs text-gray-600">{awayPriceText}</span>
+                {/* Reduced font size for odds price slightly for better visual hierarchy */}
+                <span className="text-[11px] text-gray-600 font-normal">
+                  {awayPriceText}
+                </span>
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
+              <span className="font-semibold text-[#111827] text-right">
                 {awayMl}
+              </span>
+
+              <span className="font-semibold text-[#111827] text-right">
+                {totalPointText}
               </span>
             </div>
 
             {/* Home row */}
-            <div className={ODDS_GRID_TEAMS}>
-              <span className="text-sm text-[#111827] font-medium truncate">
+            <div className={ODDS_GRID}>
+              <span className="text-[#111827] font-medium truncate text-left">
                 {game.homeTeam.name}
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
+              <span className="font-semibold text-[#111827] text-right">
                 {homePointText}{" "}
-                <span className="text-xs text-gray-600">{homePriceText}</span>
+                <span className="text-[11px] text-gray-600 font-normal">
+                  {homePriceText}
+                </span>
               </span>
 
-              <span className="text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
+              <span className="font-semibold text-[#111827] text-right">
                 {homeMl}
               </span>
-            </div>
-          </div>
 
-          {/* Separate Total row */}
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500 font-neue mb-1">
-              <span className="text-left w-full">Game Total</span>
-              <span className="text-center w-full">Over</span>
-              <span className="text-right w-full">Under</span>
-            </div>
-
-            <div className="flex items-center justify-between text-sm font-semibold text-[#111827] font-neue [font-variant-numeric:tabular-nums]">
-              <span className="text-left w-full">{pointText}</span>
-              <span className="text-center w-full">
-                <span className="text-sm text-gray-600">{overText}</span>
-              </span>
-              <span className="text-right w-full">
-                <span className="text-sm text-gray-600">{underText}</span>
+              <span className="font-semibold text-[#111827] text-right">
+                {totalPointText}
               </span>
             </div>
           </div>
 
           {/* Bookmaker name (tiny, only if present) */}
           {game.bookmakerName && (
-            <div className="mt-4 border-t border-gray-200 font-neue text-[10px] text-gray-400 font-inter text-center">
+            <div className="mt-3 border-t border-gray-200 pt-2 font-neue text-[10px] text-gray-400 font-inter text-center">
               Odds via {game.bookmakerName}
             </div>
           )}
         </div>
 
-        {/* CTA */}
-        <div className="mt-1">
-          <Link href={href}>
-            <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
-              Read Prediction
-            </span>
-          </Link>
+        {/* CTA Button (Visual only, the whole card is the link) */}
+        <div className="">
+          <span className="inline-flex w-full h-10 items-center justify-center rounded-lg bg-[#24257C] text-white text-[13px] font-inter font-bold uppercase tracking-wide transition group-hover:bg-[#C83495] group-hover:-translate-y-0.5">
+            SEE THE PICK
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

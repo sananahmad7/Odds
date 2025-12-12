@@ -116,7 +116,7 @@ function NavBar() {
 
   return (
     <nav className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-md ">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8">
+      <div className="container mx-auto  ">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="  h-20 flex items-center">
@@ -124,7 +124,7 @@ function NavBar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center">
+          <div className="hidden lg:flex items-center  gap-10 mr-5">
             {/* Home Link */}
             <Link
               href="/"
@@ -137,7 +137,7 @@ function NavBar() {
             {/* League Dropdown (desktop) */}
             <div
               ref={leagueRef}
-              className="relative py-5 px-10 mr-5 "
+              className="relative py-5  "
               onMouseEnter={
                 supportsHover ? () => setDeskLeagueOpen(true) : undefined
               }
@@ -170,7 +170,7 @@ function NavBar() {
               {deskLeagueOpen && (
                 <div
                   role="menu"
-                  className="absolute top-full left-0 w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+                  className="absolute top-full  -right-3  w-52 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
                 >
                   {leagues.map((league) => {
                     const LogoComponent = league.logo;

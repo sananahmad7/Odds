@@ -130,9 +130,9 @@ export default function Hero({ articles = [] }: HeroProps) {
         {!showSkeleton && (
           <>
             {/* label */}
-            <div className="absolute top-4  md:top-6 left-1 z-10  px-6 md:px-12 lg:px-16">
+            <div className="absolute top-4  md:top-6 left-1 z-10  px-3 md:px-6 lg:px-8">
               <span className="inline-block px-4 py-2 rounded font-neue font-semibold tracking-wide uppercase text-xs md:text-sm bg-[#24257C] text-white">
-                Analysis of the Day
+                Analysis and Angles
               </span>
             </div>
 
@@ -177,8 +177,8 @@ export default function Hero({ articles = [] }: HeroProps) {
             )}
 
             {/* content */}
-            <div className=" absolute  inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16">
-              <div className="max-w-4xl ml-2 ">
+            <div className=" absolute  inset-0 flex flex-col justify-end p-3 md:p-6 lg:p-8">
+              <div className="max-w-5xl  ">
                 {/* ⬅️ NEW: show league badge */}
                 <span className="inline-block px-3 py-1 bg-white/90 text-[#111827] text-sm font-semibold font-neue rounded mb-4">
                   {hasData ? current!.league : "SPORTS"}

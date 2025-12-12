@@ -1,12 +1,10 @@
-// Article.tsx
+// components/prediction/Article.tsx
 "use client";
 
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type {
-  DetailOutcome,
-  DetailPrediction,
   DetailEvent,
   DetailBookmaker,
   DetailMarket,
@@ -140,22 +138,16 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
   // Normalize odds
   const odds = useMemo(() => getBestOdds(event), [event]);
 
-  // Logo visibility (same pattern as GameCard, but using local event data)
+  // Logo visibility
   const [awayLogoVisible, setAwayLogoVisible] = useState(true);
   const [homeLogoVisible, setHomeLogoVisible] = useState(true);
-  const leagueFolder = event.sportTitle; // e.g. "NFL", "NBA"
+  const leagueFolder = event.sportTitle;
 
-  // Totals
+  // Totals Extraction - Cleaning up "O " and "U " to just get the number
   const totalPoint =
     odds?.total?.over?.point?.replace(/^O\s*/, "") ??
     odds?.total?.under?.point?.replace(/^U\s*/, "") ??
     "—";
-  const overPrice = odds?.total?.over?.price ?? "—";
-  const underPrice = odds?.total?.under?.price ?? "—";
-  const totalPriceLabel =
-    overPrice === "—" && underPrice === "—"
-      ? "—"
-      : `${overPrice}o / ${underPrice}u`;
 
   return (
     <article className="bg-[#FAFAFA] font-inter text-[#111827]">
@@ -210,7 +202,7 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
             </p>
           </header>
 
-          {/* 🔥 Hero image from OddsEvent.image (Cloudinary) */}
+          {/* Hero Image */}
           {event.image && event.image.trim().length > 0 && (
             <div className="mb-8">
               <div className="relative w-full h-56 sm:h-72 md:h-80 lg:h-96 rounded-2xl overflow-hidden bg-gray-100">
@@ -225,167 +217,118 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
             </div>
           )}
 
-          {/* Odds Card */}
+          {/* --- PREMIUM ODDS TABLE --- */}
           {odds ? (
-            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8">
-              {/* Top row: logos + time (US Central) */}
-              <div className="px-6 py-5 border-b border-gray-200 bg-[#FAFAFA] flex items-center justify-between">
-                {/* Away logo */}
-                <div className="flex-1 flex justify-start">
-                  {awayLogoVisible && (
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
-                      <Image
-                        src={`/${leagueFolder}/${event.awayTeam}.png`}
-                        alt={`${event.awayTeam} logo`}
-                        width={80}
-                        height={80}
-                        className="w-14 h-14 sm:w-18 sm:h-18 object-contain"
-                        onError={() => setAwayLogoVisible(false)}
-                      />
+            <div className="mb-8 border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm font-neue">
+              {/* Scroll wrapper for mobile to prevent squashing */}
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px]">
+                  {/* Table Header */}
+                  <div className="grid grid-cols-[2fr_1fr_1fr_1fr] bg-gray-50 border-b border-gray-200 px-4 py-2">
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter">
+                      Matchup
                     </div>
-                  )}
-                </div>
-
-                {/* Center: kickoff info */}
-                <div className="flex-1 text-center px-2 border-x border-gray-200">
-                  <p className="text-base sm:text-lg font-bold font-neue text-[#111827]">
-                    {kickoffDateCT}
-                  </p>
-                  <p className="text-sm sm:text-base font-semibold text-[#111827]">
-                    {kickoffTimeCT} CT
-                  </p>
-                  <p className="mt-1 text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500">
-                    {event.sportTitle}
-                  </p>
-                </div>
-
-                {/* Home logo */}
-                <div className="flex-1 flex justify-end">
-                  {homeLogoVisible && (
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 border border-gray-200">
-                      <Image
-                        src={`/${leagueFolder}/${event.homeTeam}.png`}
-                        alt={`${event.homeTeam} logo`}
-                        width={80}
-                        height={80}
-                        className="w-14 h-14 sm:w-18 sm:h-18 object-contain"
-                        onError={() => setHomeLogoVisible(false)}
-                      />
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter text-center">
+                      Spread
                     </div>
-                  )}
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter text-center">
+                      Total
+                    </div>
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider font-inter text-center">
+                      Moneyline
+                    </div>
+                  </div>
+
+                  {/* Away Team Row */}
+                  <div className="grid grid-cols-[2fr_1fr_1fr_1fr] items-center px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    {/* Team Info */}
+                    <div className="flex items-center gap-3">
+                      {awayLogoVisible && (
+                        <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                          <Image
+                            src={`/${leagueFolder}/${event.awayTeam}.png`}
+                            alt={`${event.awayTeam} logo`}
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                            onError={() => setAwayLogoVisible(false)}
+                          />
+                        </div>
+                      )}
+                      <span className="font-gtsuper font-bold text-[#111827] text-lg leading-tight">
+                        {event.awayTeam}
+                      </span>
+                    </div>
+
+                    {/* Spread */}
+                    <div className="text-center font-bold text-[#111827] text-base tabular-nums">
+                      {odds.away.spread?.point || "-"}{" "}
+                      <span className="text-xs text-gray-500 font-normal ml-0.5">
+                        {odds.away.spread?.price}
+                      </span>
+                    </div>
+
+                    {/* Total (Points Only) */}
+                    <div className="text-center font-bold text-[#111827] text-base tabular-nums">
+                      {totalPoint}
+                    </div>
+
+                    {/* Moneyline */}
+                    <div className="text-center font-bold text-[#111827] text-base tabular-nums">
+                      {odds.away.ml?.price || "-"}
+                    </div>
+                  </div>
+
+                  {/* Home Team Row */}
+                  <div className="grid grid-cols-[2fr_1fr_1fr_1fr] items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                    {/* Team Info */}
+                    <div className="flex items-center gap-3">
+                      {homeLogoVisible && (
+                        <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                          <Image
+                            src={`/${leagueFolder}/${event.homeTeam}.png`}
+                            alt={`${event.homeTeam} logo`}
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                            onError={() => setHomeLogoVisible(false)}
+                          />
+                        </div>
+                      )}
+                      <span className="font-gtsuper font-bold text-[#111827] text-lg leading-tight">
+                        {event.homeTeam}
+                      </span>
+                    </div>
+
+                    {/* Spread */}
+                    <div className="text-center font-bold text-[#111827] text-base tabular-nums">
+                      {odds.home.spread?.point || "-"}{" "}
+                      <span className="text-xs text-gray-500 font-normal ml-0.5 ">
+                        {odds.home.spread?.price}
+                      </span>
+                    </div>
+
+                    {/* Total (Points Only) */}
+                    <div className="text-center font-bold text-[#111827] text-base tabular-nums">
+                      {totalPoint}
+                    </div>
+
+                    {/* Moneyline */}
+                    <div className="text-center font-bold text-[#111827] text-base tabular-nums">
+                      {odds.home.ml?.price || "-"}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="px-6 py-5">
-                {/* Second row: team names */}
-                <div className="grid grid-cols-2 text-center border-b border-gray-200 pb-3 mb-4">
-                  <div className="border-r border-gray-200">
-                    <p className="text-sm sm:text-base font-bold font-gtsuper uppercase tracking-wider text-[#111827]">
-                      {event.awayTeam}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm sm:text-base font-gtsuper font-bold uppercase tracking-wider text-[#111827]">
-                      {event.homeTeam}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Third area: Spread / Total / Moneyline per side */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 sm:divide-x divide-gray-200 pt-1">
-                  {/* Away side block */}
-                  <div className="pb-4 sm:pb-0 sm:pr-4 border-b sm:border-b-0 border-gray-200 sm:border-0">
-                    {/* Mobile-only team label so stacked rows are clear */}
-                    <p className="sm:hidden text-xs font-neue font-semibold text-gray-500 mb-1 uppercase tracking-wider">
-                      {event.awayTeam}
-                    </p>
-                    {/* Column headers with bottom border & vertical dividers */}
-                    <div className="flex text-xs sm:text-sm font-bold font-neue text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
-                      <span className="flex-1 text-left">Spread</span>
-                      <span className="flex-1 text-center border-l border-gray-100">
-                        Total
-                      </span>
-                      <span className="flex-1 text-right border-l border-gray-100">
-                        Moneyline
-                      </span>
-                    </div>
-
-                    {/* Values with vertical dividers */}
-                    <div className="flex items-end text-base sm:text-lg font-semibold text-[#111827] [font-variant-numeric:tabular-nums]">
-                      {/* Spread */}
-                      <div className="flex-1 text-left pr-3">
-                        <div>{odds.away.spread?.point || "-"}</div>
-                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
-                          {odds.away.spread?.price || "—"}
-                        </div>
-                      </div>
-
-                      {/* Total */}
-                      <div className="flex-1 text-center px-3 border-l border-gray-100">
-                        <div>{totalPoint}</div>
-                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
-                          {totalPriceLabel}
-                        </div>
-                      </div>
-
-                      {/* Moneyline */}
-                      <div className="flex-1 my-auto text-center pl-3 border-l border-gray-100">
-                        <div>{odds.away.ml?.price || "-"}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Home side block ok*/}
-                  <div className="pt-4 sm:pt-0 sm:pl-4">
-                    {/* Mobile-only team label so stacked rows are clear */}
-                    <p className="sm:hidden text-xs font-neue font-semibold text-gray-500 mb-1 uppercase tracking-wider">
-                      {event.homeTeam}
-                    </p>
-                    {/* Column headers with bottom border & vertical dividers */}
-                    <div className="flex text-xs sm:text-sm font-neue font-bold text-[#111827] uppercase tracking-wider border-b border-gray-100 pb-2 mb-2">
-                      <span className="flex-1 text-left">Spread</span>
-                      <span className="flex-1 text-center border-l border-gray-100">
-                        Total
-                      </span>
-                      <span className="flex-1 text-right border-l border-gray-100">
-                        Moneyline
-                      </span>
-                    </div>
-
-                    {/* Values with vertical dividers */}
-                    <div className="flex items-end text-base sm:text-lg font-semibold text-[#111827] [font-variant-numeric:tabular-nums]">
-                      {/* Spread */}
-                      <div className="flex-1 text-left pr-3">
-                        <div>{odds.home.spread?.point || "-"}</div>
-                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
-                          {odds.home.spread?.price || "—"}
-                        </div>
-                      </div>
-
-                      {/* Total */}
-                      <div className="flex-1 text-center px-3 border-l border-gray-100">
-                        <div>{totalPoint}</div>
-                        <div className="text-xs sm:text-sm text-gray-500 mt-0.5">
-                          {totalPriceLabel}
-                        </div>
-                      </div>
-
-                      {/* Moneyline */}
-                      <div className="flex-1 my-auto text-center pl-3 border-l border-gray-100">
-                        <div>{odds.home.ml?.price || "-"}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom: source / bookmaker */}
-                <div className="mt-6 pt-4 border-t font-neue border-gray-200 text-sm text-center text-gray-500">
+              {/* Source Footer */}
+              <div className="bg-gray-50 px-4 py-2 text-center border-t border-gray-200">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wide font-inter">
                   Odds via{" "}
-                  <span className="font-semibold text-[#25818F]">
+                  <span className="font-bold text-[#24257C]">
                     {odds.bookmakerName}
                   </span>
-                  .
-                </div>
+                </p>
               </div>
             </div>
           ) : (
@@ -400,66 +343,144 @@ const Article = ({ event, relatedArticles = [] }: ArticleProps) => {
           <section className="mb-8">
             {event.eventpredictions.map((prediction, idx) => (
               <div key={idx} className="mb-8">
-                {/* Display Home Team Logo before the article heading */}
-                <div className="flex items-center mb-4">
-                  {/* Home team logo */}
-                  {event.sportTitle !== "MMA" && homeLogoVisible && (
-                    <div className="mr-2">
-                      <Image
-                        src={`/${event.sportTitle}/${event.homeTeam}.png`}
-                        alt={`${event.homeTeam} logo`}
-                        width={32}
-                        height={32}
-                        className="object-contain"
-                        onError={() => setHomeLogoVisible(false)}
-                      />
-                    </div>
-                  )}
-                  {/* Article heading */}
-                  <h2 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] pb-2">
-                    {prediction.article1Heading}
+                {prediction.articleTitle && (
+                  <h2 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mb-3">
+                    {prediction.articleTitle}
                   </h2>
-                </div>
+                )}
 
-                <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
-                  <p className="whitespace-pre-line">
-                    {prediction.article1Description}
-                  </p>
-                </div>
-
-                {/* Away side heading-ok */}
-                <div className="flex items-center mt-4">
-                  {event.sportTitle !== "MMA" && awayLogoVisible && (
-                    <div className="mr-2">
-                      <Image
-                        src={`/${event.sportTitle}/${event.awayTeam}.png`}
-                        alt={`${event.homeTeam} logo`}
-                        width={32}
-                        height={32}
-                        className="object-contain"
-                        onError={() => setAwayLogoVisible(false)}
-                      />
+                {/* Game Overview */}
+                {(prediction.gameOverviewHeading ||
+                  prediction.gameOverviewDescription) && (
+                  <>
+                    <h3 className="font-gtsuper text-xl sm:text-2xl font-bold text-[#111827] pb-2">
+                      {prediction.gameOverviewHeading}
+                    </h3>
+                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                      <p className="whitespace-pre-line">
+                        {prediction.gameOverviewDescription}
+                      </p>
                     </div>
-                  )}
-                  <h2 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] pb-2">
-                    {prediction.article2Heading}
-                  </h2>
-                </div>
+                  </>
+                )}
 
-                <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
-                  <p className="whitespace-pre-line">
-                    {prediction.article2Description}
-                  </p>
-                </div>
+                {/* Team A Season */}
+                {(prediction.teamASeasonHeading ||
+                  prediction.teamASeasonDescription) && (
+                  <>
+                    <div className="flex items-center mb-4">
+                      {event.sportTitle !== "MMA" && homeLogoVisible && (
+                        <div className="mr-2">
+                          <Image
+                            src={`/${event.sportTitle}/${event.homeTeam}.png`}
+                            alt={`${event.homeTeam} logo`}
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                            onError={() => setHomeLogoVisible(false)}
+                          />
+                        </div>
+                      )}
+                      <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] pb-2">
+                        {prediction.teamASeasonHeading}
+                      </h3>
+                    </div>
+                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                      <p className="whitespace-pre-line">
+                        {prediction.teamASeasonDescription}
+                      </p>
+                    </div>
+                  </>
+                )}
 
-                <h2 className="font-gtsuper text-2xl mt-4 sm:text-3xl font-bold text-[#111827] mb-4 pb-2">
-                  {prediction.article3Heading}
-                </h2>
-                <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
-                  <p className="whitespace-pre-line">
-                    {prediction.article3Description}
-                  </p>
-                </div>
+                {/* Team B Season */}
+                {(prediction.teamBSeasonHeading ||
+                  prediction.teamBSeasonDescription) && (
+                  <>
+                    <div className="flex items-center mt-4 mb-2">
+                      {event.sportTitle !== "MMA" && awayLogoVisible && (
+                        <div className="mr-2">
+                          <Image
+                            src={`/${event.sportTitle}/${event.awayTeam}.png`}
+                            alt={`${event.awayTeam} logo`}
+                            width={32}
+                            height={32}
+                            className="object-contain"
+                            onError={() => setAwayLogoVisible(false)}
+                          />
+                        </div>
+                      )}
+                      <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] pb-2">
+                        {prediction.teamBSeasonHeading}
+                      </h3>
+                    </div>
+                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                      <p className="whitespace-pre-line">
+                        {prediction.teamBSeasonDescription}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Matchup Breakdown */}
+                {(prediction.matchupBreakdownHeading ||
+                  prediction.matchupBreakdownDescription) && (
+                  <>
+                    <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
+                      {prediction.matchupBreakdownHeading}
+                    </h3>
+                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                      <p className="whitespace-pre-line">
+                        {prediction.matchupBreakdownDescription}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Spread Pick */}
+                {(prediction.spreadPickHeading ||
+                  prediction.spreadPickDescription) && (
+                  <>
+                    <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
+                      {prediction.spreadPickHeading}
+                    </h3>
+                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                      <p className="whitespace-pre-line">
+                        {prediction.spreadPickDescription}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Over/Under Pick */}
+                {(prediction.overUnderPickHeading ||
+                  prediction.overUnderPickDescription) && (
+                  <>
+                    <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
+                      {prediction.overUnderPickHeading}
+                    </h3>
+                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed mb-4">
+                      <p className="whitespace-pre-line">
+                        {prediction.overUnderPickDescription}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {/* Player Prop Pick */}
+                {(prediction.playerPropPickHeading ||
+                  prediction.playerPropPickDescription) && (
+                  <>
+                    <h3 className="font-gtsuper text-2xl sm:text-3xl font-bold text-[#111827] mt-4 mb-2 pb-2">
+                      {prediction.playerPropPickHeading}
+                    </h3>
+                    <div className="prose prose-lg max-w-none font-inter text-[#111827] leading-relaxed">
+                      <p className="whitespace-pre-line">
+                        {prediction.playerPropPickDescription}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </section>

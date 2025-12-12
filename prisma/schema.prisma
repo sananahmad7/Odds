@@ -155,18 +155,35 @@ model OddsOutcome {
 }
 
 model Eventprediction {
-  id                  Int       @id @default(autoincrement())
-  articleTitle        String    @default("")
-  article1Heading     String    @default("")
-  article1Description String    @default("")
-  article2Heading     String    @default("")
-  article2Description String    @default("")
-  article3Heading     String    @default("")
-  article3Description String    @default("")
-  event               OddsEvent @relation(fields: [oddsEventId], references: [id])
-  oddsEventId         String
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @default(now()) @updatedAt
+  id           Int    @id @default(autoincrement())
+  articleTitle String @default("")
 
-  @@index([oddsEventId]) // Create index on oddsEventId
+  gameOverviewHeading     String @default("")
+  gameOverviewDescription String @default("")
+
+  teamASeasonHeading     String @default("")
+  teamASeasonDescription String @default("")
+
+  teamBSeasonHeading     String @default("")
+  teamBSeasonDescription String @default("")
+
+  matchupBreakdownHeading     String @default("")
+  matchupBreakdownDescription String @default("")
+
+  spreadPickHeading     String @default("")
+  spreadPickDescription String @default("")
+
+  overUnderPickHeading     String @default("")
+  overUnderPickDescription String @default("")
+
+  playerPropPickHeading     String @default("")
+  playerPropPickDescription String @default("")
+
+  event       OddsEvent @relation(fields: [oddsEventId], references: [id])
+  oddsEventId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([oddsEventId])
 }

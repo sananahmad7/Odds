@@ -1,4 +1,4 @@
-//app/(frontend)/prediction/[eventId]/page.tsx
+// app/(frontend)/prediction/[eventId]/page.tsx
 import Article from "@/components/prediction/Article";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -26,12 +26,28 @@ export type DetailBookmaker = {
 export type DetailPrediction = {
   id: number;
   articleTitle: string;
-  article1Heading: string;
-  article1Description: string;
-  article2Heading: string;
-  article2Description: string;
-  article3Heading: string;
-  article3Description: string;
+
+  gameOverviewHeading: string;
+  gameOverviewDescription: string;
+
+  teamASeasonHeading: string;
+  teamASeasonDescription: string;
+
+  teamBSeasonHeading: string;
+  teamBSeasonDescription: string;
+
+  matchupBreakdownHeading: string;
+  matchupBreakdownDescription: string;
+
+  spreadPickHeading: string;
+  spreadPickDescription: string;
+
+  overUnderPickHeading: string;
+  overUnderPickDescription: string;
+
+  playerPropPickHeading: string;
+  playerPropPickDescription: string;
+
   oddsEventId: string;
 };
 
@@ -44,7 +60,7 @@ export type DetailEvent = {
   homeTeam: string;
   awayTeam: string;
   bookmakers: DetailBookmaker[];
-  eventpredictions: DetailPrediction[]; // Include event predictions here
+  eventpredictions: DetailPrediction[];
 };
 
 export type RelatedArticle = {
@@ -114,12 +130,28 @@ const EventPredictionPage = async ({
           select: {
             id: true,
             articleTitle: true,
-            article1Heading: true,
-            article1Description: true,
-            article2Heading: true,
-            article2Description: true,
-            article3Heading: true,
-            article3Description: true,
+
+            gameOverviewHeading: true,
+            gameOverviewDescription: true,
+
+            teamASeasonHeading: true,
+            teamASeasonDescription: true,
+
+            teamBSeasonHeading: true,
+            teamBSeasonDescription: true,
+
+            matchupBreakdownHeading: true,
+            matchupBreakdownDescription: true,
+
+            spreadPickHeading: true,
+            spreadPickDescription: true,
+
+            overUnderPickHeading: true,
+            overUnderPickDescription: true,
+
+            playerPropPickHeading: true,
+            playerPropPickDescription: true,
+
             oddsEventId: true,
           },
         },
@@ -171,7 +203,7 @@ const EventPredictionPage = async ({
       });
     }
 
-    // 5) Render page, hmmm passing both the event and the same-league CMS articles
+    // Render page, passing both the event and the same-league CMS articles
     return (
       <main className="w-full bg-[#FAFAFA] min-h-screen">
         <section className="w-full py-8 sm:py-12">

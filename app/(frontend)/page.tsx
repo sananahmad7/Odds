@@ -33,7 +33,7 @@ function UpcomingGamesSkeleton() {
 
 export default async function Home() {
   // ----- ARTICLES (featured) -----
-  const t0 = Date.now();
+  //const t0 = Date.now();
   const articles = await prisma.article.findMany({
     where: { isFeatured: true },
     orderBy: { publishedAt: "desc" },
@@ -52,15 +52,14 @@ export default async function Home() {
 
   return (
     <main>
-      {/* Hero renders immediately */}
-      <HomeHero articles={articles} />
-
       {/* Upcoming games streamed separately; hero isn't blocked by events */}
       <Suspense fallback={<UpcomingGamesSkeleton />}>
         <FetchUpcomingGamesSection />
       </Suspense>
+      {/* Hero renders immediately */}
+      <HomeHero articles={articles} />
 
-      <div className="h-20" />
+      <div className="h-5" />
     </main>
   );
 }
